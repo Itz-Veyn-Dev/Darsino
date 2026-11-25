@@ -787,12 +787,31 @@ function renderStats(){
     $('#tree-detail-kind').textContent=l.kind==='manual'?'ثبت دستی':'جلسه تایمر';
     treeModal.classList.add('on');treeModal.setAttribute('aria-hidden','false');
   }
-  if(!gardenEl.dataset.bound){
-    gardenEl.dataset.bound='1';
-    gardenEl.addEventListener('click',e=>{const b=e.target.closest('[data-tree-index]');if(b)openTreeDetail(+b.dataset.treeIndex)});
-    $('#tree-detail-close').addEventListener('click',closeTreeDetail);
-    treeModal.addEventListener('click',e=>{if(e.target===treeModal)closeTreeDetail()});
-    document.addEventListener('keydown',e=>{if(e.key==='Escape'&&treeModal.classList.contains('on'))closeTreeDetail()});
+  // Events are delegated from document so they keep working even when the
+  // garden contents are rebuilt by renderStats().
+  if(!window.__darsinoTreeEventsBound){
+    window.__darsinoTreeEventsBound=true;
+    document.addEventListener('click',e=>{
+      const b=e.target.closest && e.target.closest('.garden-tree[data-tree-index]');
+      if(b){
+        const logs=window.__darsinoGardenLogs||[];
+        const l=logs[Number(b.dataset.treeIndex)];
+        if(!l)return;
+        const dateText=new Intl.DateTimeFormat('fa-IR',{weekday:'long',year:'numeric',month:'long',day:'numeric'}).format(new Date(l.ts));
+        $('#tree-detail-art').innerHTML=plant(Math.max(.3,Math.min(1,l.sec/2700)),col(l.subj),{sun:true,bloom:l.sec>=2700,sway:true});
+        $('#tree-detail-title').textContent=`درخت شماره ${fa(Number(b.dataset.treeIndex)+1)}`;
+        $('#tree-detail-sub').textContent=l.sec>=2700?'یک جلسه‌ی پربار؛ این درخت حسابی رشد کرده':'هر دقیقه‌ی تلاش، یک برگ تازه';
+        $('#tree-detail-date').textContent=dateText;
+        $('#tree-detail-subject').textContent=l.subj||'بدون درس';
+        $('#tree-detail-duration').textContent=fmtDur(l.sec);
+        $('#tree-detail-kind').textContent=l.kind==='manual'?'ثبت دستی':'جلسه تایمر';
+        treeModal.classList.add('on');treeModal.setAttribute('aria-hidden','false');
+        return;
+      }
+      if(e.target.closest && e.target.closest('#tree-detail-close')){closeTreeDetail();return;}
+      if(e.target===treeModal)closeTreeDetail();
+    });
+    document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#tree-detail').classList.contains('on'))closeTreeDetail()});
   }
   // badges
   const got=ACH.filter(x=>S.ach[x.id]).length;$('#ach-n').textContent=`${fa(got)} از ${fa(ACH.length)}`;
