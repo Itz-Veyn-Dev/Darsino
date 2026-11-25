@@ -135,8 +135,30 @@ header{display:flex;justify-content:space-between;align-items:center;margin:4px 
 .hbar .h span{color:var(--mute)}
 .hbar .b{height:8px;background:var(--bg2);border-radius:8px;overflow:hidden}
 .hbar .b i{display:block;height:100%;border-radius:8px}
-.garden{display:flex;flex-wrap:wrap;gap:0;align-items:flex-end;min-height:60px;border-bottom:4px solid #5b4330;border-radius:0 0 8px 8px;padding-bottom:0}
-.garden svg{width:40px;height:40px;overflow:visible;margin:0 -3px}
+.garden{display:flex;flex-wrap:wrap;gap:5px 2px;align-items:flex-end;min-height:94px;border-bottom:4px solid #514738;border-radius:0 0 10px 10px;padding:14px 5px 0;background:linear-gradient(180deg,transparent 72%,rgba(126,99,66,.07))}
+.garden-tree{width:54px;height:68px;display:grid;place-items:end center;position:relative;border:0;background:transparent;padding:0;margin:0;cursor:pointer;border-radius:14px;transform-origin:50% 100%;transition:transform .28s cubic-bezier(.2,.8,.2,1),background .25s}
+.garden-tree svg{width:58px;height:58px;overflow:visible;pointer-events:none;transition:transform .35s cubic-bezier(.2,.9,.25,1.25)}
+.garden-tree:active{transform:translateY(-3px) scale(.96);background:rgba(167,200,155,.09)}
+.garden-tree:focus-visible{outline:2px solid var(--a);outline-offset:2px}
+.garden-tree:nth-child(3n) svg{transform:scale(.92)}
+.garden-tree:nth-child(4n) svg{transform:scale(1.08)}
+.garden-hint{width:100%;text-align:center;color:var(--mute);font-size:11px;padding:5px 0 8px}
+.tree-detail{position:fixed;inset:0;z-index:55;display:grid;place-items:center;padding:22px;background:rgba(4,8,5,.0);opacity:0;pointer-events:none;transition:background .35s ease,opacity .35s ease;backdrop-filter:blur(0)}
+.tree-detail.on{opacity:1;pointer-events:auto;background:rgba(4,8,5,.68);backdrop-filter:blur(7px)}
+.tree-detail-card{width:min(100%,360px);position:relative;overflow:hidden;border:1px solid rgba(167,200,155,.2);border-radius:28px;padding:22px 20px 20px;text-align:center;background:linear-gradient(155deg,#263329,#18211b 68%);box-shadow:0 24px 80px rgba(0,0,0,.48);transform:translateY(38px) scale(.88);opacity:0;transition:transform .72s cubic-bezier(.16,1.25,.3,1),opacity .32s ease;will-change:transform}
+.tree-detail.on .tree-detail-card{transform:translateY(0) scale(1);opacity:1}
+.tree-detail-card:before{content:"";position:absolute;width:210px;height:210px;border-radius:50%;background:rgba(167,200,155,.08);top:-125px;left:calc(50% - 105px);pointer-events:none}
+.tree-detail-close{position:absolute;top:12px;left:12px;width:38px;height:38px;border:1px solid var(--line);border-radius:13px;background:rgba(8,14,10,.35);font-size:22px;color:var(--mute);z-index:2}
+.tree-detail-art{width:142px;height:142px;margin:2px auto 8px;display:grid;place-items:center;animation:treeFloat 4.5s ease-in-out infinite}
+.tree-detail-art svg{width:100%;height:100%;overflow:visible;filter:drop-shadow(0 12px 14px rgba(0,0,0,.22))}
+@keyframes treeFloat{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-5px) rotate(1deg)}}
+.tree-detail-title{font-size:19px;font-weight:800;margin:2px 0 4px}
+.tree-detail-sub{color:var(--mute);font-size:12px;margin-bottom:17px}
+.tree-detail-meta{display:grid;grid-template-columns:1fr 1fr;gap:9px;text-align:right}
+.tree-detail-meta div{background:rgba(8,14,10,.32);border:1px solid rgba(167,200,155,.1);border-radius:15px;padding:11px 12px;min-width:0}
+.tree-detail-meta small{display:block;color:var(--mute);font-size:11px;margin-bottom:4px}
+.tree-detail-meta b{font-size:13px;overflow-wrap:anywhere}
+@media(prefers-reduced-motion:reduce){.tree-detail,.tree-detail-card,.tree-detail-art,.garden-tree,.garden-tree svg{transition:none!important;animation:none!important}}
 .badges{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .bdg{background:var(--bg2);border:1px solid var(--line);border-radius:16px;padding:12px 6px;text-align:center}
 .bdg .i{font-size:26px;filter:grayscale(1);opacity:.35}
@@ -463,6 +485,7 @@ nav{justify-content:flex-start;gap:4px;overflow-x:auto;scrollbar-width:none}nav:
 </nav>
 
 <div class="focus-overlay" id="focus-overlay"><div class="inner"><div class="subtle">اتاق تمرکز</div><h2 id="focus-subject">مطالعه</h2><div class="big" id="focus-clock">25:00</div><p>فقط همین یک کار؛ بقیه چیزها بعداً.</p><button class="btn" id="focus-toggle">شروع</button><button class="chip" id="focus-close">خروج</button></div></div>
+<div class="tree-detail" id="tree-detail" aria-hidden="true"><div class="tree-detail-card" role="dialog" aria-modal="true" aria-labelledby="tree-detail-title"><button class="tree-detail-close" id="tree-detail-close" aria-label="بستن">×</button><div class="tree-detail-art" id="tree-detail-art"></div><div class="tree-detail-title" id="tree-detail-title">درخت مطالعه</div><div class="tree-detail-sub" id="tree-detail-sub">یادگاری از یک جلسه تلاش</div><div class="tree-detail-meta"><div><small>تاریخ کاشت</small><b id="tree-detail-date">—</b></div><div><small>درس</small><b id="tree-detail-subject">—</b></div><div><small>مدت مطالعه</small><b id="tree-detail-duration">—</b></div><div><small>نوع جلسه</small><b id="tree-detail-kind">—</b></div></div></div></div>
 <div id="sheet"><div class="bd" id="sheet-bd"></div><div class="panel"><div class="grab"></div><div id="sheet-body"></div></div></div>
 
 <script>
@@ -744,9 +767,33 @@ function renderStats(){
   const se=Object.entries(A.bySub).sort((a,b)=>b[1]-a[1]);
   $('#by-subj').innerHTML=se.length?se.map(([s,v])=>`<div class="hbar"><div class="h"><b style="font-weight:500"><span class="dot" style="background:${col(s)};margin-left:6px"></span>${esc(s)}</b><span>${fmtDur(v)} · ${fa(Math.round(v/A.total*100))}٪</span></div><div class="b"><i style="width:${v/se[0][1]*100}%;background:${col(s)}"></i></div></div>`).join(''):'<div class="empty">هنوز جلسه‌ای ثبت نشده</div>';
   // garden
-  const gl=S.logs.slice(0,48);
-  $('#garden-n').textContent=`${fa(A.trees)} درخت`;
-  $('#garden').innerHTML=gl.length?gl.map(l=>plant(Math.max(.3,Math.min(1,l.sec/2700)),col(l.subj),{sun:false,bloom:l.sec>=2700})).join(''):'<div class="empty" style="width:100%">اولین جلسه‌ات رو کامل کن تا اولین درخت بکاری</div>';
+  const gl=S.logs.filter(l=>l.sec>=60).slice().sort((a,b)=>a.ts-b.ts).slice(-48);
+  $('#garden-n').textContent=`${fa(gl.length)} درخت`;
+  $('#garden').innerHTML=gl.length?gl.map((l,i)=>`<button class="garden-tree" type="button" data-tree-index="${i}" aria-label="جزئیات درخت ${fa(i+1)}">${plant(Math.max(.3,Math.min(1,l.sec/2700)),col(l.subj),{sun:false,bloom:l.sec>=2700})}</button>`).join('')+'<div class="garden-hint">روی هر درخت بزن تا خاطره‌ی اون جلسه رو ببینی</div>':'<div class="empty" style="width:100%">اولین جلسه‌ات رو کامل کن تا اولین درخت بکاری</div>';
+  window.__darsinoGardenLogs=gl;
+  // Interactive garden: each tree remembers its study session.
+  const gardenEl=$('#garden'),treeModal=$('#tree-detail');
+  function closeTreeDetail(){treeModal.classList.remove('on');treeModal.setAttribute('aria-hidden','true');}
+  function openTreeDetail(index){
+    const logs=window.__darsinoGardenLogs||[],l=logs[index];if(!l)return;
+    const date=new Date(l.ts);
+    const dateText=new Intl.DateTimeFormat('fa-IR',{weekday:'long',year:'numeric',month:'long',day:'numeric'}).format(date);
+    $('#tree-detail-art').innerHTML=plant(Math.max(.3,Math.min(1,l.sec/2700)),col(l.subj),{sun:true,bloom:l.sec>=2700,sway:true});
+    $('#tree-detail-title').textContent=`درخت شماره ${fa(index+1)}`;
+    $('#tree-detail-sub').textContent=l.sec>=2700?'یک جلسه‌ی پربار؛ این درخت حسابی رشد کرده':'هر دقیقه‌ی تلاش، یک برگ تازه';
+    $('#tree-detail-date').textContent=dateText;
+    $('#tree-detail-subject').textContent=l.subj||'بدون درس';
+    $('#tree-detail-duration').textContent=fmtDur(l.sec);
+    $('#tree-detail-kind').textContent=l.kind==='manual'?'ثبت دستی':'جلسه تایمر';
+    treeModal.classList.add('on');treeModal.setAttribute('aria-hidden','false');
+  }
+  if(!gardenEl.dataset.bound){
+    gardenEl.dataset.bound='1';
+    gardenEl.addEventListener('click',e=>{const b=e.target.closest('[data-tree-index]');if(b)openTreeDetail(+b.dataset.treeIndex)});
+    $('#tree-detail-close').addEventListener('click',closeTreeDetail);
+    treeModal.addEventListener('click',e=>{if(e.target===treeModal)closeTreeDetail()});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape'&&treeModal.classList.contains('on'))closeTreeDetail()});
+  }
   // badges
   const got=ACH.filter(x=>S.ach[x.id]).length;$('#ach-n').textContent=`${fa(got)} از ${fa(ACH.length)}`;
   $('#badges').innerHTML=ACH.map(x=>`<div class="bdg ${S.ach[x.id]?'on':''}"><div class="i">${badgeSvg(x.id)}</div><b>${x.t}</b><small>${x.d}</small></div>`).join('');
