@@ -3,13 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="theme-color" content="#101713" id="meta-theme">
+<meta name="theme-color" content="#0d1024" id="meta-theme">
+<title>درسینو</title>
+<link rel="manifest" href="./manifest.webmanifest">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="icon.svg" type="image/svg+xml">
-<title>درسینو</title>
 <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#101311;--bg2:#171c19;--card:#1b221e;--card2:#252e28;--line:#303b33;--text:#edf1eb;--mute:#9aa79d;--a:#a7c89b;--b:#789b83;--w:#c7b58a;--danger:#d98585;--ink:#101711}
@@ -316,11 +315,6 @@ nav{justify-content:flex-start;gap:4px;overflow-x:auto;scrollbar-width:none}nav:
 .checkrow,.itemrow{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--line)}.checkrow:last-child,.itemrow:last-child{border:0}.checkrow input{width:18px;height:18px;accent-color:var(--a)}.grow{flex:1;min-width:0}.subtle{color:var(--mute);font-size:12px}.metric{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:13px;min-width:0}.metric b{font-size:21px;display:block}.metric small{color:var(--mute)}.metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-bottom:12px}.tagpill{font-size:11px;padding:4px 8px;border-radius:8px;background:var(--card2);color:var(--mute)}.empty{padding:16px;color:var(--mute);text-align:center;font-size:13px}.tx,select.tx,textarea.tx{width:100%;margin:5px 0 12px}.focus-overlay{position:fixed;inset:0;z-index:30;background:var(--bg);display:none;align-items:center;justify-content:center;padding:24px;text-align:center}.focus-overlay.on{display:flex}.focus-overlay .inner{width:min(100%,430px)}.focus-overlay .big{font-size:clamp(54px,17vw,88px);font-weight:800;direction:ltr;font-variant-numeric:tabular-nums}.focus-overlay h2{font-size:20px}.focus-overlay p{color:var(--mute)}.focus-overlay button{margin:6px}
 
 </style>
-<script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
-}
-</script>
 </head>
 <body>
 <div id="toasts"></div>
@@ -833,9 +827,45 @@ function renderTests(){const a=S.tests,qs=a.reduce((n,x)=>n+x.count,0),correct=a
  $('#test-list').innerHTML=a.length?a.slice().sort((x,y)=>y.ts-x.ts).map(x=>`<div class="itemrow"><div class="grow"><b>${esc(x.subj)} · ${fa(x.count)} تست</b><div class="subtle">${new Date(x.ts).toLocaleDateString('fa-IR')} · ${fa(x.minutes)} دقیقه · درست ${fa(x.correct)} / غلط ${fa(x.wrong)} / نزده ${fa(x.blank)}</div>${x.note?`<div class="subtle">${esc(x.note)}</div>`:''}</div><b>${fa(x.count?Math.round(x.correct/x.count*100):0)}٪</b><button class="x" data-test-del="${x.id}">×</button></div>`).join(''):'<div class="empty">هنوز آزمونی ثبت نکردی. اولین آزمونت رو ثبت کن!</div>';
 }
 function renderExams(){const a=S.exams.slice().sort((x,y)=>x.date.localeCompare(y.date));$('#exam-list').innerHTML=a.length?a.map(x=>{const days=Math.ceil((new Date(x.date+'T00:00:00')-new Date(todayKey()+'T00:00:00'))/864e5);return `<div class="card"><div class="row"><div class="grow"><h3>${esc(x.title)}</h3><small>${esc(x.subj)}</small></div><span class="tagpill">${days<0?'گذشته':days===0?'امروز':`${fa(days)} روز مانده`}</span></div><p class="subtle">${new Date(x.date+'T00:00:00').toLocaleDateString('fa-IR')} · آمادگی: ${fa(x.ready)}٪</p><div class="xp"><i style="width:${x.ready}%"></i></div><p class="subtle">${esc(x.topics||'بدون مبحث ثبت‌شده')}</p><button class="x" data-exam-del="${x.id}">حذف امتحان</button></div>`}).join(''):'<div class="empty">امتحان‌های مهمت رو اینجا ثبت کن تا روزشمارشون رو ببینی.</div>'}
-function renderInsights(){const now=Date.now(),week=S.logs.filter(x=>now-x.ts<7*864e5),prev=S.logs.filter(x=>now-x.ts>=7*864e5&&now-x.ts<14*864e5),sum=a=>a.reduce((n,x)=>n+x.sec,0),by={};week.forEach(x=>by[x.subj]=(by[x.subj]||0)+x.sec);const top=Object.entries(by).sort((a,b)=>b[1]-a[1])[0];const diff=sum(week)-sum(prev);const tasks=S.tasks.filter(x=>x.date===todayKey()),done=tasks.filter(x=>x.done).length;
- $('#insight-content').innerHTML=`<div class="metrics"><div class="metric"><small>مطالعه این هفته</small><b>${fmtDur(sum(week))}</b></div><div class="metric"><small>نسبت به هفته قبل</small><b>${diff>=0?'+':'−'}${fmtDur(Math.abs(diff))}</b></div><div class="metric"><small>پرتکرارترین درس</small><b style="font-size:17px">${top?esc(top[0]):'—'}</b></div><div class="metric"><small>وظایف امروز</small><b>${fa(done)} از ${fa(tasks.length)}</b></div></div><div class="card"><h3>پیشنهاد درسینو</h3><p class="subtle">${!week.length?'هنوز داده کافی برای تحلیل نداریم؛ چند جلسه مطالعه ثبت کن.':top?`این هفته بیشترین زمانت برای ${esc(top[0])} بوده. ${Object.keys(by).length>1?'برای درس‌های دیگر هم زمان مشخصی کنار بگذار.':'تنوع درس‌ها را هم در برنامه‌ات در نظر بگیر.'}`:'به‌تازگی مطالعه‌ای ثبت نشده.'}</p><p class="subtle">${diff>=0?'روند زمان مطالعه‌ات نسبت به هفته قبل بهتر یا برابر بوده.':'زمان مطالعه‌ات نسبت به هفته قبل کمتر شده؛ برنامه را سبک و قابل اجرا بچین.'}</p></div>`;
- const missions=[{t:'امروز حداقل ۳۰ دقیقه مطالعه کن',ok:S.logs.some(x=>dayIdx(x.ts)===dayIdx(now))&&S.logs.filter(x=>dayIdx(x.ts)===dayIdx(now)).reduce((a,x)=>a+x.sec,0)>=1800},{t:'سه درس مختلف در هفته بخوان',ok:Object.keys(by).length>=3},{t:'سه روز در هفته مطالعه ثبت کن',ok:new Set(week.map(x=>dayIdx(x.ts))).size>=3}];$('#missions').innerHTML=missions.map(m=>`<div class="checkrow"><span class="tagpill">${m.ok?'انجام شد':'در انتظار'}</span><div class="grow">${m.t}</div></div>`).join('');
+function renderInsights(){
+ const now=Date.now(),today=dayIdx(now),sum=a=>a.reduce((n,x)=>n+(Number(x.sec)||0),0);
+ const inDay=(x,d)=>dayIdx(x.ts)===d;
+ const dayLogs=S.logs.filter(x=>inDay(x,today));
+ const prevLogs=S.logs.filter(x=>inDay(x,today-1));
+ const week=S.logs.filter(x=>dayIdx(x.ts)>=today-6&&dayIdx(x.ts)<=today);
+ const prev=S.logs.filter(x=>dayIdx(x.ts)>=today-13&&dayIdx(x.ts)<=today-7);
+ const dayTests=S.tests.filter(x=>inDay(x,today));
+ const weekTests=S.tests.filter(x=>dayIdx(x.ts)>=today-6&&dayIdx(x.ts)<=today);
+ const totalTests=a=>a.reduce((n,x)=>n+(Number(x.count)||0),0);
+ const totalCorrect=a=>a.reduce((n,x)=>n+(Number(x.correct)||0),0);
+ const totalMinutes=a=>a.reduce((n,x)=>n+(Number(x.minutes)||0),0);
+ const accuracy=a=>{const n=totalTests(a);return n?Math.round(totalCorrect(a)/n*100):0};
+ const daySec=sum(dayLogs),prevSec=sum(prevLogs),weekSec=sum(week),prevSecWeek=sum(prev);
+ const dayBy={},weekBy={};
+ dayLogs.forEach(x=>dayBy[x.subj]=(dayBy[x.subj]||0)+x.sec);
+ week.forEach(x=>weekBy[x.subj]=(weekBy[x.subj]||0)+x.sec);
+ const dayTop=Object.entries(dayBy).sort((a,b)=>b[1]-a[1])[0];
+ const weekTop=Object.entries(weekBy).sort((a,b)=>b[1]-a[1])[0];
+ const tasks=S.tasks.filter(x=>x.date===todayKey()),done=tasks.filter(x=>x.done).length;
+ const goal=(Number(S.goal)||120)*60,dayPct=goal?Math.min(100,Math.round(daySec/goal*100)):0;
+ const diff=weekSec-prevSecWeek;
+ const dayRows=Array.from({length:7},(_,i)=>{const d=today-6+i,secs=sum(S.logs.filter(x=>inDay(x,d)));return {d,secs,label:i===6?'امروز':new Intl.DateTimeFormat('fa-IR',{weekday:'short'}).format(new Date(d*864e5))}});
+ const max=Math.max(1,...dayRows.map(x=>x.secs));
+ const bars=dayRows.map(x=>`<div class="grow" style="text-align:center;min-width:0"><div style="height:92px;display:flex;align-items:end;justify-content:center"><i title="${fmtDur(x.secs)}" style="display:block;width:65%;max-width:26px;height:${Math.max(4,Math.round(x.secs/max*88))}px;border-radius:8px 8px 3px 3px;background:${x.d===today?'var(--a)':'var(--b)'};opacity:${x.secs?1:.22}"></i></div><small class="subtle" style="font-size:10px">${x.label}</small></div>`).join('');
+ $('#insight-content').innerHTML=`
+ <div class="card"><div class="row"><div class="grow"><h3>تحلیل امروز</h3><p class="subtle">خلاصه عملکرد روزانه‌ات</p></div><span class="tagpill">${fa(dayPct)}٪ هدف</span></div>
+ <div class="metrics"><div class="metric"><small>زمان مطالعه</small><b>${fmtDur(daySec)}</b></div><div class="metric"><small>جلسات</small><b>${fa(dayLogs.length)}</b></div><div class="metric"><small>تست امروز</small><b>${fa(totalTests(dayTests))}</b></div><div class="metric"><small>دقت تست</small><b>${dayTests.length?fa(accuracy(dayTests))+'٪':'—'}</b></div></div>
+ <div class="xp" style="margin:12px 0"><i style="width:${dayPct}%"></i></div>
+ <p class="subtle">${dayTop?`بیشترین زمان امروز برای <b>${esc(dayTop[0])}</b> بوده (${fmtDur(dayTop[1])}).`:'هنوز جلسه‌ای برای امروز ثبت نکردی.'} ${tasks.length?`وظایف امروز: ${fa(done)} از ${fa(tasks.length)} انجام‌شده.`:''}</p>
+ <p class="subtle">${prevSec===0?(daySec?'دیروز جلسه‌ای ثبت نشده بود؛ مقایسه زمانی ممکن نیست.':'با ثبت مطالعه، مقایسه امروز و دیروز اینجا نمایش داده می‌شود.'): `نسبت به دیروز ${daySec>=prevSec?'افزایش':'کاهش'} ${fmtDur(Math.abs(daySec-prevSec))} در زمان مطالعه داشتی.`}</p></div>
+ <div class="card"><h3>تحلیل هفتگی</h3><div class="metrics"><div class="metric"><small>مطالعه ۷ روز</small><b>${fmtDur(weekSec)}</b></div><div class="metric"><small>تعداد جلسات</small><b>${fa(week.length)}</b></div><div class="metric"><small>کل تست‌ها</small><b>${fa(totalTests(weekTests))}</b></div><div class="metric"><small>دقت تست</small><b>${weekTests.length?fa(accuracy(weekTests))+'٪':'—'}</b></div></div>
+ <p class="subtle">روند مطالعه در هفت روز اخیر</p><div class="row" style="align-items:end;gap:5px;padding:4px 0 8px">${bars}</div>
+ <p class="subtle">${weekTop?`درس پرتکرار: <b>${esc(weekTop[0])}</b> با ${fmtDur(weekTop[1])} مطالعه.`:'هنوز داده‌ای برای تحلیل هفتگی وجود ندارد.'}</p>
+ <p class="subtle">${prevSecWeek===0?(weekSec?'برای مقایسه با هفته قبل، به داده‌های بیشتری نیاز داریم.':'با ثبت جلسات، روند هفتگی اینجا نمایش داده می‌شود.'): `نسبت به ۷ روز قبل، زمان مطالعه ${diff>=0?'افزایش':'کاهش'} ${fmtDur(Math.abs(diff))} داشته است.`}</p></div>
+ <div class="card"><h3>پراکندگی مطالعه بین درس‌ها</h3>${Object.keys(weekBy).length?Object.entries(weekBy).sort((a,b)=>b[1]-a[1]).map(([name,sec])=>`<div style="margin:12px 0"><div class="row"><span>${esc(name)}</span><small class="subtle">${fmtDur(sec)} · ${fa(weekSec?Math.round(sec/weekSec*100):0)}٪</small></div><div class="xp"><i style="width:${weekSec?sec/weekSec*100:0}%"></i></div></div>`).join(''):'<div class="empty">با ثبت مطالعه در درس‌های مختلف، این بخش کامل می‌شود.</div>'}</div>
+ <div class="card"><h3>پیشنهاد درسینو</h3><p class="subtle">${!week.length?'چند جلسه مطالعه ثبت کن تا بتوانیم روندت را تحلیل کنیم.':weekTop?`این هفته بیشترین زمانت برای ${esc(weekTop[0])} بوده. اگر درس دیگری عقب افتاده، در برنامه روزهای بعد برایش زمان مشخصی بگذار.`:'هنوز مطالعه‌ای ثبت نشده.'}</p></div>`;
+ const missions=[{t:'امروز حداقل ۳۰ دقیقه مطالعه کن',ok:daySec>=1800},{t:'سه درس مختلف در هفته بخوان',ok:Object.keys(weekBy).length>=3},{t:'سه روز در هفته مطالعه ثبت کن',ok:new Set(week.map(x=>dayIdx(x.ts))).size>=3}];
+ $('#missions').innerHTML=missions.map(m=>`<div class="checkrow"><span class="tagpill">${m.ok?'انجام شد':'در انتظار'}</span><div class="grow">${m.t}</div></div>`).join('');
 }
 function addForm(label,fields,submit){let html=`<h2>${label}</h2>`+fields+`<button class="btn" id="form-save">ثبت</button>`;sheet(html);$('#form-save').onclick=submit}
 $('#task-add').onclick=()=>addForm('وظیفه جدید',`<label class="lb">عنوان</label><input class="tx" id="f-title" placeholder="مثلاً حل تمرین ریاضی"><label class="lb">درس</label><select class="tx" id="f-subj">${S.subjects.map(x=>`<option>${esc(x)}</option>`).join('')}</select><label class="lb">زمان تخمینی (دقیقه)</label><input class="tx" id="f-min" type="number" min="5" value="30">`,()=>{const title=$('#f-title').value.trim();if(!title)return toast('عنوان رو وارد کن');S.tasks.push({id:Date.now(),title,subj:$('#f-subj').value,minutes:+$('#f-min').value||0,date:todayKey(),done:false});save();closeSheet();renderPlan()});
@@ -869,5 +899,6 @@ renderAll();
 if(run){clearInterval(tick);tick=setInterval(drawClock,250);lock()}
 if(!S.onboarded&&!S.logs.length)onboard();
 </script>
+<script>if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));}</script>
 </body>
 </html>

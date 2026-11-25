@@ -1,15 +1,20 @@
 {
   "id": "./",
-  "name": "درسینو | همراه مطالعه",
+  "name": "درسینو",
   "short_name": "درسینو",
-  "lang": "fa",
-  "dir": "rtl",
-  "start_url": "./index.html",
+  "description": "همراه آفلاین مطالعه و برنامه‌ریزی",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#101713",
-  "theme_color": "#101713",
+  "orientation": "portrait",
+  "background_color": "#101311",
+  "theme_color": "#101311",
   "icons": [
-    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
   ]
 }
