@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" data-theme="night">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#101713" id="meta-theme">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<title>درسینو</title>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#101311;--bg2:#171c19;--card:#1b221e;--card2:#252e28;--line:#303b33;--text:#edf1eb;--mute:#9aa79d;--a:#a7c89b;--b:#789b83;--w:#c7b58a;--danger:#d98585;--ink:#101711}
+[data-theme=forest]{--bg:#101713;--bg2:#18221b;--card:#1d2a21;--card2:#29392d;--line:#354a3a;--mute:#9aafa0;--a:#a7c89b;--b:#718f78;--w:#c7b58a}
+[data-theme=sunset]{--bg:#171615;--bg2:#211e1b;--card:#292521;--card2:#383129;--line:#494137;--mute:#b2a89a;--a:#c7b58a;--b:#9c8972;--w:#d2c39f}
+[data-theme=ocean]{--bg:#11181b;--bg2:#192328;--card:#1d2b30;--card2:#293b40;--line:#374b50;--mute:#9aafb2;--a:#9dbdc0;--b:#718e93;--w:#c2b99c}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:Vazirmatn,Tahoma,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+body{min-height:100vh;background:radial-gradient(800px 460px at 90% -8%,var(--card2) 0%,transparent 62%),radial-gradient(700px 500px at -15% 105%,var(--card) 0%,transparent 55%),var(--bg);background-attachment:fixed;padding:env(safe-area-inset-top) 0 calc(92px + env(safe-area-inset-bottom));overscroll-behavior:none}
+button{font:inherit;color:inherit;cursor:pointer}
+.app{max-width:480px;margin:0 auto;padding:16px 16px 0}
+.view{display:none}.view.on{display:block;animation:fade .25s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* header */
+header{display:flex;justify-content:space-between;align-items:center;margin:4px 0 14px}
+.hello small{color:var(--mute);font-size:12.5px;display:block}
+.hello b{font-size:21px;font-weight:800}
+.chips-top{display:flex;gap:8px}
+.pill{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:13px;display:flex;gap:6px;align-items:center;font-weight:700}
+.pill.fire b{color:var(--w)}
+.lvl{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:10px 12px;margin-bottom:14px}
+.lvl .badge{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--a),var(--b));color:var(--ink);font-weight:800;display:grid;place-items:center;font-size:16px;flex:none}
+.lvl .info{flex:1;min-width:0}
+.lvl .row1{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:6px}
+.lvl .row1 span{color:var(--mute)}
+.xp{height:7px;background:var(--bg2);border-radius:9px;overflow:hidden}
+.xp i{display:block;height:100%;background:linear-gradient(90deg,var(--a),var(--b));border-radius:9px;transition:width .6s}
+
+/* phases */
+.phases{display:flex;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:4px;margin-bottom:12px}
+.phases button{flex:1;border:0;background:none;color:var(--mute);font-size:12.5px;padding:9px 2px;border-radius:12px;white-space:nowrap}
+.phases button.on{background:var(--card2);color:var(--text);font-weight:700;box-shadow:inset 0 0 0 1px var(--line)}
+.presets{display:flex;gap:7px;justify-content:center;margin-bottom:6px;min-height:34px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--text);font-size:13px;padding:7px 13px;border-radius:999px;display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
+.chip.on{border-color:var(--a);color:var(--a);background:color-mix(in srgb,var(--a) 10%,var(--card))}
+.chip.add{border-style:dashed;color:var(--mute)}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex:none}
+
+/* ring */
+.ring-wrap{position:relative;width:292px;height:292px;margin:6px auto 4px}
+.ring-wrap svg.r{width:100%;height:100%;transform:rotate(-90deg)}
+.track{stroke:var(--card2);fill:none}
+.arc{fill:none;stroke-linecap:round;transition:stroke-dashoffset .5s linear}
+#arc-out{stroke:var(--w);opacity:.95}
+#arc-in{filter:drop-shadow(0 0 9px color-mix(in srgb,var(--a) 55%,transparent))}
+.center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+#plant{width:112px;height:104px;margin:-8px 0 -10px}
+#plant svg{width:100%;height:100%;overflow:visible}
+#plant.pop{animation:pop .6s ease}
+@keyframes pop{40%{transform:scale(1.18)}}
+.tree{overflow:visible}
+.tree.sw .swg{animation:sway 3.6s ease-in-out infinite;transform-origin:50px 84px}
+.tree.ps .swg{filter:saturate(.6) brightness(.88)}
+@keyframes sway{0%,100%{transform:rotate(-2.2deg)}50%{transform:rotate(2.4deg)}}
+.tw{animation:tw 1.7s ease-in-out infinite}
+@keyframes tw{50%{opacity:.3}}
+.center .t{font-size:46px;font-weight:800;letter-spacing:1px;font-variant-numeric:tabular-nums;direction:ltr;line-height:1.1}
+.center .l{color:var(--mute);font-size:13px;margin-top:2px}
+.center .g{margin-top:6px;font-size:11.5px;color:var(--w);background:color-mix(in srgb,var(--w) 12%,transparent);padding:3px 10px;border-radius:999px}
+.dots{display:flex;gap:8px;justify-content:center;margin:2px 0 12px}
+.dots i{width:9px;height:9px;border-radius:50%;background:var(--card2);border:1px solid var(--line)}
+.dots i.f{background:var(--a);border-color:var(--a);box-shadow:0 0 8px var(--a)}
+.subjects{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 12px;scrollbar-width:none}
+.subjects::-webkit-scrollbar{display:none}
+
+/* controls */
+.ctrl{display:flex;justify-content:center;align-items:flex-start;gap:26px;margin:4px 0 18px}
+.cb{display:flex;flex-direction:column;align-items:center;gap:6px;background:none;border:0;color:var(--mute);font-size:11.5px;width:64px}
+.cb .ic{width:52px;height:52px;border-radius:50%;background:var(--card);border:1px solid var(--line);display:grid;place-items:center}
+.cb svg{width:22px;height:22px;stroke:var(--text);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.cb.hide{visibility:hidden}
+.cb.main{width:84px;color:var(--text)}
+.cb.main .ic{width:76px;height:76px;background:linear-gradient(135deg,var(--a),var(--b));border:0;box-shadow:0 12px 30px color-mix(in srgb,var(--a) 30%,transparent)}
+.cb.main svg{stroke:var(--ink);fill:var(--ink);width:30px;height:30px;stroke-width:1.5}
+.cb:active .ic{transform:scale(.94)}
+[data-phase=short] .cb.main .ic,[data-phase=long] .cb.main .ic{background:linear-gradient(135deg,var(--w),var(--a))}
+
+/* cards */
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:15px;margin-bottom:14px}
+.card h3{margin:0 0 12px;font-size:14.5px;display:flex;justify-content:space-between;align-items:center}
+.card h3 small{color:var(--mute);font-weight:400;font-size:12px}
+.week{display:flex;justify-content:space-between}
+.wd{display:flex;flex-direction:column;align-items:center;gap:7px;font-size:11.5px;color:var(--mute)}
+.wd .c{width:34px;height:34px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-size:12px;color:var(--text)}
+.wd.d .c{background:color-mix(in srgb,var(--a) 22%,transparent);border-color:var(--a)}
+.wd.g .c{background:var(--a);border-color:var(--a);color:var(--ink);font-weight:800}
+.wd.t{color:var(--text);font-weight:700}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 6px;text-align:center}
+.tile b{display:block;font-size:18px;font-weight:800}
+.tile span{font-size:11.5px;color:var(--mute)}
+.quote{text-align:center;color:var(--mute);font-size:12.5px;padding:4px 20px 10px;line-height:1.9}
+
+/* stats */
+.seg{display:flex;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:4px;margin-bottom:14px}
+.seg button{flex:1;border:0;background:none;color:var(--mute);font-size:13px;padding:8px;border-radius:10px}
+.seg button.on{background:var(--card2);color:var(--text);font-weight:700}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:13px}
+.kpi span{font-size:12px;color:var(--mute)}
+.kpi b{display:block;font-size:20px;font-weight:800;margin-top:3px}
+.kpi.big{grid-column:span 2;background:linear-gradient(135deg,color-mix(in srgb,var(--a) 16%,var(--card)),color-mix(in srgb,var(--b) 16%,var(--card)))}
+.kpi.big b{font-size:28px}
+.plot{position:relative;height:120px;display:flex;align-items:flex-end;gap:var(--gap,6px);border-bottom:1px solid var(--line)}
+.plot .col{flex:1;display:flex;align-items:flex-end;height:100%}
+.plot i{display:block;width:100%;border-radius:6px 6px 2px 2px;background:linear-gradient(180deg,var(--b),color-mix(in srgb,var(--b) 55%,var(--bg)));min-height:3px}
+.plot .col.today i{background:linear-gradient(180deg,var(--a),color-mix(in srgb,var(--a) 55%,var(--bg)))}
+.goal-line{position:absolute;left:0;right:0;border-top:1.5px dashed var(--w);opacity:.7}
+.xl{display:flex;gap:var(--gap,6px);margin-top:6px}
+.xl span{flex:1;text-align:center;font-size:10.5px;color:var(--mute);overflow:visible;white-space:nowrap}
+.heat{display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,1fr);gap:4px;direction:ltr}
+.heat i{aspect-ratio:1;border-radius:5px;background:var(--card2);display:block}
+.heat i.e{background:transparent}
+.heat i.l1{background:color-mix(in srgb,var(--a) 25%,var(--card2))}
+.heat i.l2{background:color-mix(in srgb,var(--a) 50%,var(--card2))}
+.heat i.l3{background:color-mix(in srgb,var(--a) 75%,var(--card2))}
+.heat i.l4{background:var(--a)}
+.heat i.now{outline:1.5px solid var(--text)}
+.legend{display:flex;justify-content:flex-end;align-items:center;gap:4px;font-size:10.5px;color:var(--mute);margin-top:9px;direction:ltr}
+.legend i{width:11px;height:11px;border-radius:3px;display:block}
+.hbar{margin-bottom:11px}
+.hbar .h{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px}
+.hbar .h span{color:var(--mute)}
+.hbar .b{height:8px;background:var(--bg2);border-radius:8px;overflow:hidden}
+.hbar .b i{display:block;height:100%;border-radius:8px}
+.garden{display:flex;flex-wrap:wrap;gap:0;align-items:flex-end;min-height:60px;border-bottom:4px solid #5b4330;border-radius:0 0 8px 8px;padding-bottom:0}
+.garden svg{width:40px;height:40px;overflow:visible;margin:0 -3px}
+.badges{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.bdg{background:var(--bg2);border:1px solid var(--line);border-radius:16px;padding:12px 6px;text-align:center}
+.bdg .i{font-size:26px;filter:grayscale(1);opacity:.35}
+.bdg b{display:block;font-size:12px;margin-top:5px;color:var(--mute)}
+.bdg small{display:block;font-size:10.5px;color:var(--mute);opacity:.7;margin-top:2px;line-height:1.5}
+.bdg.on{border-color:var(--a);background:color-mix(in srgb,var(--a) 9%,var(--bg2))}
+.bdg.on .i{filter:none;opacity:1}
+.bdg.on b{color:var(--text)}
+
+/* history */
+.fbar{display:flex;gap:8px;overflow-x:auto;padding-bottom:12px;scrollbar-width:none}
+.fbar::-webkit-scrollbar{display:none}
+.dayh{display:flex;justify-content:space-between;color:var(--mute);font-size:12.5px;margin:6px 4px 8px}
+.dayh b{color:var(--text)}
+.log{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:11px 12px;margin-bottom:8px}
+.log .n{flex:1;min-width:0}
+.log .n b{display:block;font-size:14px}
+.log .n small{color:var(--mute);font-size:11.5px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.log .d{font-weight:700;font-size:14px;direction:ltr}
+.log .m{font-size:18px}
+.log .x{background:none;border:0;color:var(--mute);font-size:20px;padding:2px 6px}
+.empty{color:var(--mute);text-align:center;padding:30px 10px;font-size:13.5px;line-height:2}
+.fab{position:fixed;bottom:calc(86px + env(safe-area-inset-bottom));left:18px;background:linear-gradient(135deg,var(--a),var(--b));color:var(--ink);border:0;border-radius:18px;padding:13px 18px;font-weight:700;box-shadow:0 10px 26px rgba(0,0,0,.4);z-index:9;display:none}
+.fab.on{display:block}
+
+/* settings */
+.set-row{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--line);font-size:14px;gap:10px}
+.set-row:last-child{border:0}
+.set-row small{display:block;color:var(--mute);font-size:11.5px}
+.step{display:flex;align-items:center;gap:10px}
+.step button{width:32px;height:32px;border-radius:10px;border:1px solid var(--line);background:var(--bg2);font-size:18px;line-height:1}
+.step b{min-width:46px;text-align:center;font-size:14px}
+.sw{position:relative;width:48px;height:28px;flex:none}
+.sw input{display:none}
+.sw span{position:absolute;inset:0;background:var(--bg2);border:1px solid var(--line);border-radius:20px;transition:.2s}
+.sw span::after{content:"";position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:50%;background:var(--mute);transition:.2s}
+.sw input:checked+span{background:color-mix(in srgb,var(--a) 30%,var(--bg2));border-color:var(--a)}
+.sw input:checked+span::after{transform:translateX(-20px);background:var(--a)}
+.themes{display:flex;gap:10px}
+.themes button{width:44px;height:44px;border-radius:14px;border:2px solid var(--line);padding:0;overflow:hidden;position:relative}
+.themes button.on{border-color:var(--text)}
+.themes i{position:absolute;inset:0;display:block}
+input.tx,select.tx,textarea.tx{width:100%;background:var(--bg2);border:1px solid var(--line);color:var(--text);font:inherit;border-radius:12px;padding:12px;font-size:15px;margin-bottom:10px;outline:none}
+input.tx:focus,textarea.tx:focus,select.tx:focus{border-color:var(--a)}
+textarea.tx{resize:none;height:76px}
+label.lb{font-size:12.5px;color:var(--mute);display:block;margin:0 2px 5px}
+.btn{border:0;font-weight:700;border-radius:16px;padding:14px 20px;font-size:15px;color:var(--ink);background:linear-gradient(135deg,var(--a),var(--b));width:100%}
+.btn.ghost{background:var(--bg2);color:var(--text);border:1px solid var(--line)}
+.btn.danger{background:var(--bg2);color:var(--danger);border:1px solid var(--line)}
+.btn:active{transform:scale(.98)}
+.row{display:flex;gap:10px}.row>*{flex:1}
+.sub-row{display:flex;gap:8px}.sub-row input{margin:0}.sub-row .btn{width:auto;padding:0 18px;font-size:14px}
+.tag{display:flex;align-items:center;gap:10px;padding:8px 0}
+.tag b{flex:1;font-weight:500;font-size:14px}
+.tag button{background:none;border:0;color:var(--danger);font-size:18px}
+
+/* nav */
+nav{position:fixed;bottom:0;left:0;right:0;background:color-mix(in srgb,var(--bg2) 88%,transparent);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:8px 10px calc(8px + env(safe-area-inset-bottom));z-index:10}
+nav button{background:none;border:0;color:var(--mute);font-size:11px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 20px;border-radius:14px;min-width:70px}
+nav svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+nav button.on{color:var(--a);background:color-mix(in srgb,var(--a) 10%,transparent)}
+
+/* sheet */
+#sheet{position:fixed;inset:0;z-index:40;display:none}
+#sheet.on{display:block}
+#sheet .bd{position:absolute;inset:0;background:rgba(3,5,18,.6);animation:fadein .2s}
+#sheet .panel{position:absolute;left:0;right:0;bottom:0;max-width:480px;margin:0 auto;background:var(--bg2);border:1px solid var(--line);border-bottom:0;border-radius:26px 26px 0 0;padding:10px 18px calc(22px + env(safe-area-inset-bottom));max-height:90vh;overflow:auto;animation:up .3s cubic-bezier(.2,.9,.3,1)}
+#sheet .grab{width:42px;height:4px;background:var(--line);border-radius:4px;margin:0 auto 14px}
+#sheet h2{margin:0 0 4px;font-size:19px;text-align:center}
+#sheet p.s{margin:0 0 16px;color:var(--mute);text-align:center;font-size:13px}
+@keyframes up{from{transform:translateY(100%)}to{transform:none}}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+.moods{display:flex;justify-content:space-between;margin:4px 0 14px}
+.moods button{font-size:28px;background:var(--card);border:2px solid transparent;border-radius:16px;width:54px;height:54px;filter:grayscale(.8);opacity:.6}
+.moods button.on{filter:none;opacity:1;border-color:var(--a)}
+.bigplant{width:130px;height:130px;margin:0 auto 2px}
+.bigplant svg{width:100%;height:100%;overflow:visible}
+.seg.mini{margin-bottom:10px}
+
+#toasts{position:fixed;top:calc(12px + env(safe-area-inset-top));left:0;right:0;z-index:60;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none}
+.toast{background:var(--text);color:var(--bg);font-weight:700;padding:11px 18px;border-radius:14px;font-size:13.5px;box-shadow:0 10px 30px rgba(0,0,0,.4);animation:tin .3s;pointer-events:auto;display:flex;gap:12px;align-items:center;max-width:92vw}
+.toast button{background:none;border:0;color:var(--b);font-weight:800;padding:0}
+@keyframes tin{from{transform:translateY(-30px);opacity:0}to{transform:none;opacity:1}}
+.cf{position:fixed;top:-12px;width:9px;height:14px;z-index:70;border-radius:2px;animation:fall linear forwards;pointer-events:none}
+@keyframes fall{to{transform:translateY(105vh) rotate(720deg);opacity:.8}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* Mobile-first visual refresh */
+:root{color-scheme:dark}
+html,body{background:var(--bg)}
+body{background:radial-gradient(520px 300px at 50% -140px,rgba(143,174,139,.13),transparent 72%),var(--bg);padding-bottom:calc(104px + env(safe-area-inset-bottom))}
+.app{max-width:520px;padding:20px 18px 24px}
+header{margin:2px 0 18px}
+.hello small{font-size:12px;letter-spacing:.02em}
+.hello b{font-size:23px;letter-spacing:-.5px}
+.chips-top{gap:6px}
+.pill{min-height:36px;padding:6px 10px;background:rgba(31,40,34,.88);border-color:rgba(157,179,158,.13);font-size:12px}
+.mini-ico{width:15px;height:15px;fill:none;stroke:var(--a);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.lvl{border-radius:18px;background:linear-gradient(120deg,#202a23,#19211c);border-color:rgba(167,200,155,.15);padding:12px 14px;margin-bottom:16px}
+.lvl .badge{background:var(--a);color:#142016;border-radius:13px}
+.xp{height:6px;background:#303a32}.xp i{background:linear-gradient(90deg,#a7c89b,#718f78)}
+.phases,.seg{background:#171d19;border-color:#2c372f;border-radius:15px}
+.phases button,.seg button{font-size:12px;padding:10px 3px}
+.phases button.on,.seg button.on{background:#2a352d;box-shadow:inset 0 0 0 1px #435447;color:#eaf1e8}
+.chip{background:#1a211c;border-color:#303c33;border-radius:12px;padding:8px 13px;font-size:12px}
+.chip.on{background:rgba(167,200,155,.12);border-color:#819f7d;color:#c7dfbd}
+.ring-wrap{width:min(82vw,310px);height:min(82vw,310px);margin:10px auto 5px}
+.track{stroke:#29332c}
+#arc-out{stroke:#b3a27d}
+#arc-in{filter:drop-shadow(0 0 8px rgba(167,200,155,.2))}
+.center .t{font-size:49px;font-weight:700;letter-spacing:-1px}
+.center .g{background:rgba(199,181,138,.12);color:#d4c39e}
+.center .l{font-size:12px}
+.dots i{background:#263129;border-color:#354238}
+.dots i.f{background:var(--a);border-color:var(--a);box-shadow:0 0 8px rgba(167,200,155,.35)}
+.subjects{padding:4px 1px 14px;gap:7px}
+.ctrl{gap:32px;margin:2px 0 22px;align-items:center}
+.cb .ic{background:#202822;border-color:#344137;width:50px;height:50px}
+.cb.main .ic{width:74px;height:74px;background:var(--a);box-shadow:0 9px 24px rgba(113,151,112,.2)}
+.cb.main svg{stroke:#152016;fill:#152016}
+.card,.kpi,.tile{background:linear-gradient(145deg,#1d251f,#19201b);border:1px solid rgba(160,183,160,.12);border-radius:19px;box-shadow:0 8px 24px rgba(0,0,0,.09)}
+.card{padding:16px;margin-bottom:13px}
+.card h3{font-size:14px;margin-bottom:14px}
+.card h3 small{font-size:11px}
+.week{gap:3px}
+.wd .c{width:35px;height:35px;border-color:#39453c}
+.wd.d .c{background:rgba(167,200,155,.14);border-color:#779675}
+.wd.g .c{background:var(--a);border-color:var(--a);color:#142016}
+.tiles{gap:8px}
+.tile{padding:13px 5px}
+.tile b{font-size:19px}
+.tile span{font-size:11px}
+.quote{font-size:12px;color:#849187;line-height:2}
+.kpi{padding:14px}
+.kpi.big{background:linear-gradient(125deg,rgba(167,200,155,.13),rgba(120,155,131,.08))}
+.plot i{background:linear-gradient(180deg,#789b83,#3d5946)}
+.plot .col.today i{background:linear-gradient(180deg,#c0d8b3,#789b83)}
+.goal-line{border-color:#c7b58a}
+.heat i{border-radius:3px;background:#29342c}
+.heat i.l1{background:#3c5140}.heat i.l2{background:#58765b}.heat i.l3{background:#83a77f}.heat i.l4{background:#b5d1a7}
+.hbar .b{background:#2a342c}
+.hbar .b i{background:linear-gradient(90deg,#789b83,#a7c89b)!important}
+.garden{border-bottom-color:#514738}
+.bdg{background:#1a211c;border-color:#303b33;border-radius:15px;padding:13px 6px}
+.bdg .i{height:30px;display:grid;place-items:center;color:#718c75;opacity:.42}
+.bdg .i svg{width:25px;height:25px;fill:none;stroke:currentColor;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round}
+.bdg.on{background:rgba(167,200,155,.09);border-color:#718f75}
+.bdg.on .i{color:#b5d1a7;opacity:1}
+.bdg b{font-size:11.5px}
+.log{background:#1b231d;border-color:#303b33;border-radius:15px;padding:12px}
+.log .m{font-size:11px;color:var(--a);background:#29362b;border-radius:8px;padding:4px 7px}
+.fab{bottom:calc(92px + env(safe-area-inset-bottom));left:16px;background:var(--a);color:#142016;border-radius:15px;box-shadow:0 8px 22px rgba(0,0,0,.28)}
+.set-row{padding:13px 0}
+input.tx,select.tx,textarea.tx{background:#141a16;border-color:#344137;border-radius:13px}
+input.tx:focus,textarea.tx:focus,select.tx:focus{border-color:#8eae88}
+.btn{background:var(--a);color:#142016;border-radius:13px}
+.btn.ghost{background:#222b24;border-color:#364238}
+.btn.danger{background:#2b2221;border-color:#493331;color:#dc9991}
+.themes button.on{border-color:#dce8d8}
+nav{background:rgba(20,26,22,.94);border-color:#303a32;padding:8px 8px calc(8px + env(safe-area-inset-bottom))}
+nav button{min-width:0;flex:1;padding:7px 3px;font-size:10.5px;border-radius:12px}
+nav svg{width:22px;height:22px}
+nav button.on{color:#c0d8b3;background:rgba(167,200,155,.1)}
+#sheet .panel{background:#171e19;border-color:#344137;padding-left:20px;padding-right:20px}
+#sheet .grab{background:#4a574c}
+.moods{gap:6px}
+.moods button{flex:1;width:auto;height:44px;font-size:11px;font-family:inherit;background:#222b24;border:1px solid #354238;border-radius:12px;filter:none;opacity:1;color:var(--mute);padding:0 2px}
+.moods button.on{border-color:#8eae88;background:rgba(167,200,155,.13);color:#dcebd7}
+.toast{background:#e6eee3;color:#1b281d}
+.toast button{color:#587d5d}
+@media(min-width:600px){.app{padding-top:28px}.ring-wrap{width:320px;height:320px}}
+@media(max-width:360px){.app{padding-left:13px;padding-right:13px}.hello b{font-size:20px}.pill{padding:5px 8px}.phases button{font-size:11px}.ring-wrap{width:78vw;height:78vw}.ctrl{gap:22px}}
+
+/* expanded study tools */
+nav{justify-content:flex-start;gap:4px;overflow-x:auto;scrollbar-width:none}nav::-webkit-scrollbar{display:none}nav button{flex:0 0 56px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:19px;line-height:1.1}nav button small{font-size:9px;white-space:nowrap}
+.checkrow,.itemrow{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--line)}.checkrow:last-child,.itemrow:last-child{border:0}.checkrow input{width:18px;height:18px;accent-color:var(--a)}.grow{flex:1;min-width:0}.subtle{color:var(--mute);font-size:12px}.metric{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:13px;min-width:0}.metric b{font-size:21px;display:block}.metric small{color:var(--mute)}.metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-bottom:12px}.tagpill{font-size:11px;padding:4px 8px;border-radius:8px;background:var(--card2);color:var(--mute)}.empty{padding:16px;color:var(--mute);text-align:center;font-size:13px}.tx,select.tx,textarea.tx{width:100%;margin:5px 0 12px}.focus-overlay{position:fixed;inset:0;z-index:30;background:var(--bg);display:none;align-items:center;justify-content:center;padding:24px;text-align:center}.focus-overlay.on{display:flex}.focus-overlay .inner{width:min(100%,430px)}.focus-overlay .big{font-size:clamp(54px,17vw,88px);font-weight:800;direction:ltr;font-variant-numeric:tabular-nums}.focus-overlay h2{font-size:20px}.focus-overlay p{color:var(--mute)}.focus-overlay button{margin:6px}
+
+</style>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+}
+</script>
+</head>
+<body>
+<div id="toasts"></div>
+<div class="app" id="app" data-phase="focus">
+
+  <!-- HOME -->
+  <section class="view on" id="v-home">
+    <header>
+      <div class="hello"><small id="hello-s"></small><b id="hello-n">درسینو</b></div>
+      <div class="chips-top">
+        <div class="pill fire"><svg class="mini-ico" viewBox="0 0 24 24"><path d="M12 3c1 4-3 5-3 9a3 3 0 0 0 6 0c0-2-1-3-1-5 4 3 6 6 4 10a7 7 0 0 1-13-3c0-4 3-8 7-11Z"/></svg><b id="streak">۰</b></div>
+        <div class="pill"><svg class="mini-ico" viewBox="0 0 24 24"><path d="M12 21v-7m0 0L7 9h10l-5 5Zm0-5L5 6h14l-7 8Z"/></svg><span id="trees">۰</span></div>
+        <button class="pill" id="amb-btn" aria-label="صدای محیط"><svg class="mini-ico" viewBox="0 0 24 24"><path d="M4 13v-2a8 8 0 0 1 16 0v2M4 13h3v6H5a1 1 0 0 1-1-1v-5Zm16 0h-3v6h2a1 1 0 0 0 1-1v-5Z"/></svg><span id="amb-t">خاموش</span></button>
+      </div>
+    </header>
+    <div class="lvl">
+      <div class="badge" id="lv-n">۱</div>
+      <div class="info"><div class="row1"><b id="lv-name"></b><span id="lv-xp"></span></div><div class="xp"><i id="lv-bar" style="width:0"></i></div></div>
+    </div>
+
+    <div class="phases" id="phases">
+      <button data-p="focus" class="on">تمرکز</button>
+      <button data-p="short">استراحت کوتاه</button>
+      <button data-p="long">استراحت بلند</button>
+      <button data-p="free">آزاد</button>
+    </div>
+    <div class="presets" id="presets"></div>
+
+    <div class="ring-wrap">
+      <svg class="r" viewBox="0 0 300 300">
+        <defs>
+          <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--a)"/><stop offset="1" style="stop-color:var(--b)"/></linearGradient>
+          <linearGradient id="g2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--w)"/><stop offset="1" style="stop-color:var(--a)"/></linearGradient>
+        </defs>
+        <circle class="track" cx="150" cy="150" r="141" stroke-width="6"/>
+        <circle class="arc" id="arc-out" cx="150" cy="150" r="141" stroke-width="6" stroke-dasharray="886.0" stroke-dashoffset="886.0"/>
+        <circle class="track" cx="150" cy="150" r="120" stroke-width="13"/>
+        <circle class="arc" id="arc-in" cx="150" cy="150" r="120" stroke-width="13" stroke="url(#g1)" stroke-dasharray="754.0" stroke-dashoffset="754.0"/>
+      </svg>
+      <div class="center">
+        <div id="plant"></div>
+        <div class="t" id="clock">25:00</div>
+        <div class="l" id="clock-l"></div>
+        <div class="g" id="goal-l"></div>
+      </div>
+    </div>
+    <div class="dots" id="dots"></div>
+    <div class="subjects" id="subj-pick"></div>
+
+    <div class="row" style="justify-content:center;margin:0 0 12px"><button class="chip" id="focus-room-open">ورود به اتاق تمرکز</button></div>
+    <div class="ctrl">
+      <button class="cb hide" id="b-reset"><span class="ic"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v5h5"/></svg></span>ریست</button>
+      <button class="cb main" id="b-main"><span class="ic"><svg viewBox="0 0 24 24" id="ic-main"></svg></span><span id="t-main">شروع</span></button>
+      <button class="cb hide" id="b-stop"><span class="ic"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg></span><span id="t-stop">ثبت</span></button>
+    </div>
+
+    <div class="card"><h3>این هفته <small id="week-sum"></small></h3><div class="week" id="week"></div></div>
+    <div class="tiles" id="tiles"></div>
+    <div class="quote" id="quote"></div>
+  </section>
+
+  <!-- STATS -->
+  <section class="view" id="v-stats">
+    <header><div class="hello"><small>گزارش پیشرفت</small><b>آمار من</b></div></header>
+    <div class="seg" id="range"><button data-r="7" class="on">۷ روز</button><button data-r="30">۳۰ روز</button><button data-r="90">۹۰ روز</button></div>
+    <div class="kpis" id="kpis"></div>
+    <div class="card"><h3>مطالعه روزانه <small>خط‌چین = هدف</small></h3><div class="plot" id="plot"></div><div class="xl" id="xl"></div></div>
+    <div class="card"><h3>تقویم تلاش <small>۱۵ هفته اخیر</small></h3><div class="heat" id="heat"></div><div class="legend">کم <i style="background:var(--card2)"></i><i style="background:color-mix(in srgb,var(--a) 25%,var(--card2))"></i><i style="background:color-mix(in srgb,var(--a) 50%,var(--card2))"></i><i style="background:color-mix(in srgb,var(--a) 75%,var(--card2))"></i><i style="background:var(--a)"></i> زیاد</div></div>
+    <div class="card"><h3>ساعت‌های طلایی <small id="part-ins"></small></h3><div id="parts"></div></div>
+    <div class="card"><h3>به تفکیک درس</h3><div id="by-subj"></div></div>
+    <div class="card"><h3>باغ من <small id="garden-n"></small></h3><div class="garden" id="garden"></div></div>
+    <div class="card"><h3>دستاوردها <small id="ach-n"></small></h3><div class="badges" id="badges"></div></div>
+  </section>
+
+  <!-- HISTORY -->
+  <section class="view" id="v-hist">
+    <header><div class="hello"><small>همه جلسه‌ها</small><b>تاریخچه</b></div></header>
+    <div class="fbar" id="fbar"></div>
+    <div id="hist"></div>
+  </section>
+
+  <!-- PLANNER -->
+  <section class="view" id="v-plan">
+    <header><div class="hello"><small>برنامه‌ریزی</small><b>برنامه امروز</b></div><button class="chip" id="task-add">+ وظیفه</button></header>
+    <div class="card"><h3>پیشرفت برنامه <small id="task-progress">۰ از ۰</small></h3><div class="xp"><i id="task-bar" style="width:0%"></i></div><div id="task-list" style="margin-top:12px"></div></div>
+    <div class="card"><h3>جلسه بعدی</h3><div id="next-session" class="empty">هنوز یادداشتی برای جلسه بعد ثبت نکردی.</div></div>
+    <div class="card"><h3>یادداشت‌های مطالعه</h3><div id="study-notes"></div><button class="btn ghost" id="note-add" style="margin-top:10px">+ یادداشت جدید</button></div>
+  </section>
+  <!-- TESTS -->
+  <section class="view" id="v-tests">
+    <header><div class="hello"><small>آزمون و تمرین</small><b>گزارش تست‌ها</b></div><button class="chip" id="test-add">+ ثبت آزمون</button></header>
+    <div class="kpis" id="test-kpis"></div><div class="card"><h3>آزمون‌های اخیر</h3><div id="test-list"></div></div>
+  </section>
+  <!-- EXAMS -->
+  <section class="view" id="v-exams">
+    <header><div class="hello"><small>آمادگی امتحان</small><b>امتحان‌های پیش‌رو</b></div><button class="chip" id="exam-add">+ امتحان</button></header>
+    <div id="exam-list"></div>
+  </section>
+  <!-- INSIGHTS -->
+  <section class="view" id="v-insights">
+    <header><div class="hello"><small>تحلیل عملکرد</small><b>بینش مطالعه</b></div></header>
+    <div id="insight-content"></div><div class="card"><h3>ماموریت‌های این هفته</h3><div id="missions"></div></div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section class="view" id="v-set">
+    <header><div class="hello"><small>شخصی‌سازی</small><b>تنظیمات</b></div></header>
+    <div class="card"><h3>پروفایل</h3>
+      <label class="lb">اسم تو</label><input class="tx" id="set-name" placeholder="مثلاً حسام">
+      <div class="set-row"><div>هدف روزانه<small>برای حلقه بیرونی و تقویم</small></div><div class="step" data-k="goal" data-min="15" data-max="720" data-step="15"><button data-d="-1">−</button><b></b><button data-d="1">+</button></div></div>
+    </div>
+    <div class="card"><h3>تایمر پومودورو</h3>
+      <div class="set-row"><div>مدت تمرکز</div><div class="step" data-k="set.focus" data-min="5" data-max="120" data-step="5"><button data-d="-1">−</button><b></b><button data-d="1">+</button></div></div>
+      <div class="set-row"><div>استراحت کوتاه</div><div class="step" data-k="set.short" data-min="1" data-max="30" data-step="1"><button data-d="-1">−</button><b></b><button data-d="1">+</button></div></div>
+      <div class="set-row"><div>استراحت بلند</div><div class="step" data-k="set.long" data-min="5" data-max="60" data-step="5"><button data-d="-1">−</button><b></b><button data-d="1">+</button></div></div>
+      <div class="set-row"><div>استراحت بلند بعد از<small>تعداد جلسه تمرکز</small></div><div class="step" data-k="set.every" data-min="2" data-max="8" data-step="1" data-unit="جلسه"><button data-d="-1">−</button><b></b><button data-d="1">+</button></div></div>
+      <div class="set-row"><div>شروع خودکار مرحله بعد</div><label class="sw"><input type="checkbox" data-tg="autoBreak"><span></span></label></div>
+    </div>
+    <div class="card"><h3>حس و حال</h3>
+      <div class="set-row"><div>صدا پایان تایمر</div><label class="sw"><input type="checkbox" data-tg="sound"><span></span></label></div>
+      <div class="set-row" style="display:block"><div>صدای محیط<small>موقع تمرکز پخش می‌شه</small></div><div class="seg mini" id="amb" style="margin:10px 0 0"><button data-a="off">خاموش</button><button data-a="rain">باران</button><button data-a="wind">باد</button><button data-a="brown">نویز</button></div></div>
+      <div class="set-row"><div>لرزش</div><label class="sw"><input type="checkbox" data-tg="vibrate"><span></span></label></div>
+      <div class="set-row"><div>روشن ماندن صفحه<small>موقع تایمر</small></div><label class="sw"><input type="checkbox" data-tg="awake"><span></span></label></div>
+      <div class="set-row"><div>تم رنگی</div><div class="themes" id="themes">
+        <button data-t="night"><i style="background:linear-gradient(135deg,#a7c89b,#789b83)"></i></button>
+        <button data-t="forest"><i style="background:linear-gradient(135deg,#9dbd91,#5d8067)"></i></button>
+        <button data-t="sunset"><i style="background:linear-gradient(135deg,#c7b58a,#8b7770)"></i></button>
+        <button data-t="ocean"><i style="background:linear-gradient(135deg,#829eaa,#5d7887)"></i></button>
+      </div></div>
+    </div>
+    <div class="card"><h3>درس‌ها</h3><div id="subj-list"></div>
+      <div class="sub-row" style="margin-top:10px"><input class="tx" id="new-subj" placeholder="درس جدید"><button class="btn" id="add-subj">افزودن</button></div>
+    </div>
+    <div class="card"><h3>داده‌ها</h3>
+      <div class="row"><button class="btn ghost" id="b-export">پشتیبان‌گیری</button><button class="btn ghost" id="b-import">بازیابی</button></div>
+      <button class="btn danger" id="b-reset-all" style="margin-top:10px">پاک کردن همه چیز</button>
+    </div>
+    <div class="quote">درسینو · نسخه ۲</div>
+  </section>
+</div>
+
+<button class="fab" id="fab">+ ثبت دستی</button>
+
+<nav id="nav">
+  <button data-v="home" class="on"><small>تایمر</small></button><button data-v="plan"><small>برنامه</small></button><button data-v="tests"><small>تست‌ها</small></button><button data-v="exams"><small>امتحان</small></button><button data-v="insights"><small>تحلیل</small></button><button data-v="stats"><small>آمار</small></button><button data-v="hist"><small>سوابق</small></button><button data-v="set"><small>تنظیمات</small></button>
+</nav>
+
+<div class="focus-overlay" id="focus-overlay"><div class="inner"><div class="subtle">اتاق تمرکز</div><h2 id="focus-subject">مطالعه</h2><div class="big" id="focus-clock">25:00</div><p>فقط همین یک کار؛ بقیه چیزها بعداً.</p><button class="btn" id="focus-toggle">شروع</button><button class="chip" id="focus-close">خروج</button></div></div>
+<div id="sheet"><div class="bd" id="sheet-bd"></div><div class="panel"><div class="grab"></div><div id="sheet-body"></div></div></div>
+
+<script>
+/* ---------- helpers ---------- */
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fa=n=>String(n).replace(/\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d]);
+const pad=n=>String(n).padStart(2,'0');
+const dayIdx=t=>{const d=new Date(t);return Math.round(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/864e5)};
+const fmtDur=sec=>{sec=Math.round(sec);let h=Math.floor(sec/3600),m=Math.round((sec%3600)/60);if(m===60){h++;m=0}return h?(m?`${fa(h)}س ${fa(m)}د`:`${fa(h)}س`):`${fa(m)}د`};
+const fmtTime=t=>new Intl.DateTimeFormat('fa-IR',{hour:'2-digit',minute:'2-digit',hour12:false}).format(t);
+const dayLabel=i=>{const t=dayIdx(Date.now());if(i===t)return'امروز';if(i===t-1)return'دیروز';return new Intl.DateTimeFormat('fa-IR',{weekday:'long',day:'numeric',month:'long',timeZone:'UTC'}).format(new Date(i*864e5))};
+const wdLetter=i=>new Intl.DateTimeFormat('fa-IR',{weekday:'narrow',timeZone:'UTC'}).format(new Date(i*864e5));
+const COLORS=['#7cf0c9','#8b7cff','#ffb86b','#ff6b8a','#5ad7ff','#c6f26b','#f28cf0','#ffd86b'];
+const MOODS=['ضعیف','کم','معمولی','خوب','عالی'];
+const QUOTES=['قطره قطره جمع گردد، وانگهی دریا شود.','امروز یه قدم کوچیک، فردا یه تفاوت بزرگ.','تمرکز یعنی گفتن «نه» به هزار چیز دیگه.','سخت‌ترین قسمت، شروع کردنه. شروع کن!','پیوستگی از شدت مهم‌تره.','استراحت هم بخشی از مطالعه‌ست.','هر جلسه، یه درخت تازه توی باغته.'];
+
+/* ---------- storage ---------- */
+const KEY='dorsino-v1';let mem=null;
+const store={get(){try{const r=localStorage.getItem(KEY);return r?JSON.parse(r):mem}catch(e){return mem}},set(v){mem=v;try{localStorage.setItem(KEY,JSON.stringify(v))}catch(e){}}};
+const DEF={name:'',subjects:['ریاضی','فیزیک','زبان انگلیسی','برنامه‌نویسی'],logs:[],tests:[],tasks:[],exams:[],notes:[],goal:120,theme:'night',ach:{},cycle:0,onboarded:false,timer:null,
+  set:{focus:25,short:5,long:15,every:4,autoBreak:true,sound:true,vibrate:true,awake:true,amb:'off'}};
+let S=(()=>{const r=store.get();const d=JSON.parse(JSON.stringify(DEF));if(!r)return d;const s=Object.assign(d,r);s.set=Object.assign({},DEF.set,r.set||{});s.tests=s.tests||[];s.tasks=s.tasks||[];s.exams=s.exams||[];s.notes=s.notes||[];return s})();
+const save=()=>store.set(S);
+const col=s=>COLORS[Math.max(0,S.subjects.indexOf(s))%COLORS.length];
+
+/* ---------- toasts / sheet / confetti ---------- */
+function toast(msg,act,fn){const e=document.createElement('div');e.className='toast';e.innerHTML=`<span>${msg}</span>`;if(act){const b=document.createElement('button');b.textContent=act;b.onclick=()=>{fn&&fn();e.remove()};e.appendChild(b)}$('#toasts').appendChild(e);setTimeout(()=>e.remove(),act?5000:2800)}
+let tq=[],tbusy=false;
+function toastQ(m){tq.push(m);if(!tbusy)(function n(){const m=tq.shift();if(!m){tbusy=false;return}tbusy=true;toast(m);setTimeout(n,1700)})()}
+let sheetDismiss=true;
+function sheet(html,dismiss=true){$('#sheet-body').innerHTML=html;$('#sheet').classList.add('on');sheetDismiss=dismiss}
+function closeSheet(){$('#sheet').classList.remove('on')}
+$('#sheet-bd').onclick=()=>{if(sheetDismiss)closeSheet()};
+function confetti(){if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;const cs=['#7cf0c9','#8b7cff','#ffb86b','#ff6b8a','#5ad7ff'];for(let i=0;i<44;i++){const d=document.createElement('i');d.className='cf';d.style.left=Math.random()*100+'vw';d.style.background=cs[i%5];d.style.animationDuration=(1.6+Math.random()*1.4)+'s';d.style.animationDelay=Math.random()*.4+'s';document.body.appendChild(d);setTimeout(()=>d.remove(),3600)}}
+let ac=null;
+function beep(){if(!S.set.sound)return;try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();[660,880,1100].forEach((f,i)=>{const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=f;o.connect(g);g.connect(ac.destination);const t=ac.currentTime+i*.2;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.25,t+.03);g.gain.exponentialRampToValueAtTime(.0001,t+.18);o.start(t);o.stop(t+.2)})}catch(e){}}
+const buzz=()=>{if(S.set.vibrate&&navigator.vibrate)navigator.vibrate([180,90,180])};
+
+/* ---------- plant svg (continuous growth) ---------- */
+const ease=t=>t<=0?0:t>=1?1:t*t*(3-2*t);
+function plant(p,color,o={}){
+  p=Math.max(0,Math.min(1,p));const c=color||'var(--a)',by=84,wilt=!!o.wilt;
+  const mid=wilt?'#8a7348':c,dk=wilt?'#6b5a3a':`color-mix(in srgb,${c} 62%,#06240f)`,lt=wilt?'#a89060':`color-mix(in srgb,${c} 70%,#ffffff)`;
+  const wrap=b=>`<svg viewBox="0 0 100 100" class="tree${o.sway?' sw':''}${o.paused?' ps':''}">${b}</svg>`;
+  let s='';
+  if(o.sun!==false){const sy=(70-ease(p)*44).toFixed(1);s+=`<circle cx="83" cy="${sy}" r="12" style="fill:var(--w)" opacity=".16"/><circle cx="83" cy="${sy}" r="6.5" style="fill:var(--w)" opacity=".92"/>`}
+  s+=`<ellipse cx="50" cy="92" rx="32" ry="5" fill="rgba(255,255,255,.08)"/><path d="M24 91Q50 76 76 91Z" fill="#5b4330"/><path d="M24 91Q50 76 76 91" fill="none" stroke="#7a5a40" stroke-width="1"/>`;
+  if(p<.06)return wrap(s+`<ellipse cx="50" cy="83" rx="3.8" ry="2.7" fill="#c79a62"/><path d="M48.5 82.2q1.5-1 3 0" stroke="#8a6a3c" stroke-width=".8" fill="none"/>`);
+  const t=ease((p-.05)/.95),H=3+t*50,top=by-H,w=1.5+t*3.4,lean=2.5*(1-t*.5);
+  let g=`<path d="M50 ${by}Q${50+lean} ${by-H*.5} 50 ${top}" fill="none" stroke="${wilt?'#7a6445':'#a8794a'}" stroke-width="${w.toFixed(2)}" stroke-linecap="round"/>`;
+  for(let i=0;i<6;i++){const k=ease((p-(.08+i*.075))/.14);if(k<=0)continue;const side=i%2?1:-1,y=by-H*(.22+i*.12),L=(i<3?7.5:5)*k,cx=50+side*L*.85;
+    g+=`<ellipse cx="${cx.toFixed(1)}" cy="${y.toFixed(1)}" rx="${L.toFixed(1)}" ry="${(L*.48).toFixed(1)}" transform="rotate(${wilt?side*55:side*-26} ${cx.toFixed(1)} ${y.toFixed(1)})" fill="${i%2?mid:lt}"/>`}
+  const ck=ease((p-.42)/.58);
+  if(ck>0){const R=(3+ck*19)*(wilt?.75:1),cy=top+R*.05;
+    g+=`<circle cx="${(50-R*.82).toFixed(1)}" cy="${(cy+R*.62).toFixed(1)}" r="${(R*.7).toFixed(1)}" fill="${dk}"/><circle cx="${(50+R*.82).toFixed(1)}" cy="${(cy+R*.62).toFixed(1)}" r="${(R*.7).toFixed(1)}" fill="${dk}"/><circle cx="50" cy="${cy.toFixed(1)}" r="${R.toFixed(1)}" fill="${mid}"/><circle cx="${(50-R*.3).toFixed(1)}" cy="${(cy-R*.35).toFixed(1)}" r="${(R*.55).toFixed(1)}" fill="${lt}" opacity=".75"/>`;
+    if(o.bloom&&p>=.97){let f='';[[-.5,-.55],[.45,-.4],[0,.05],[-.75,.5],[.8,.5],[.2,-.85],[-.2,.7]].forEach((q,i)=>{f+=`<circle cx="${(50+q[0]*R).toFixed(1)}" cy="${(cy+q[1]*R).toFixed(1)}" r="2.1" fill="${i%2?'#ffe27a':'#ffb3c7'}"/>`});
+      g+=`<g class="tw">${f}</g>`;
+      s+=`<g class="tw" stroke="var(--w)" stroke-width="1.2" stroke-linecap="round"><path d="M16 24v7M12.5 27.5h7"/><path d="M86 8v6M83 11h6"/><path d="M10 60v5M7.5 62.5h5"/></g>`}
+  }
+  const dl=o.sway?` style="animation-delay:-${((Date.now()/1000)%3.6).toFixed(2)}s"`:'';
+  return wrap(s+`<g class="swg"${dl}>${g}</g>`);
+}
+const CUP=`<svg viewBox="0 0 48 48"><path d="M10 20h24v10a10 10 0 0 1-10 10h-4a10 10 0 0 1-10-10z" fill="var(--w)"/><path d="M34 23h3a4 4 0 0 1 0 8h-3" fill="none" stroke="var(--w)" stroke-width="3"/><path d="M17 8c-2 3 2 4 0 8M24 8c-2 3 2 4 0 8" fill="none" stroke="var(--mute)" stroke-width="2" stroke-linecap="round"/></svg>`;
+
+
+function badgeSvg(id){
+ const paths={
+ first:'<path d="M12 20V11m0 4c-5 0-7-3-7-7 4 0 7 2 7 7Zm0-3c0-5 3-8 8-8 0 5-3 8-8 8Z"/>',
+ s3:'<path d="M12 3c2 3-1 4 1 6 1-2 2-2 3-4 4 5 4 10 0 13a7 7 0 0 1-10-9c1-2 3-4 6-6Z"/>',
+ s7:'<path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9Z"/>',
+ s30:'<path d="M8 4h8v4a4 4 0 0 1-8 0V4Zm0 2H4v2a4 4 0 0 0 4 4m8-6h4v2a4 4 0 0 1-4 4m-4 0v5m-4 3h8"/>',
+ h10:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+ h50:'<path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3V4Zm0 13a3 3 0 0 1 3-3h11"/>',
+ h100:'<path d="M4 19V5l8 7 8-7v14"/>',
+ mar:'<path d="M4 15c2-5 5-7 8-7s6 2 8 7M7 17h10M12 4v4"/>',
+ early:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2"/>',
+ owl:'<path d="M4 18V8l4 2 4-5 4 5 4-2v10l-8 3-8-3Zm4-5h.01M16 13h.01M9 17h6"/>',
+ goal:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',
+ tree:'<path d="M12 21v-7m0 0L6 9h12l-6 5Zm0-5L7 4h10l-5 5Z"/>',
+ sub:'<rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><path d="M16.5 13v7m-3.5-3.5h7"/>'
+ };
+ return `<svg viewBox="0 0 24 24" aria-hidden="true">${paths[id]||paths.first}</svg>`;
+}
+
+/* ---------- aggregates / levels / achievements ---------- */
+const LV=['تازه‌کار','کنجکاو','پیگیر','متمرکز','حرفه‌ای','استاد','افسانه'];
+const lvlOf=min=>Math.floor(Math.sqrt(Math.max(0,min)/20))+1;
+const ACH=[
+ {id:'first',i:'1',t:'اولین قدم',d:'اولین جلسه',f:a=>a.n>=1},
+ {id:'s3',i:'2',t:'داغِ داغ',d:'۳ روز پیاپی',f:a=>a.best>=3},
+ {id:'s7',i:'3',t:'هفته طلایی',d:'۷ روز پیاپی',f:a=>a.best>=7},
+ {id:'s30',i:'4',t:'پایدار',d:'۳۰ روز پیاپی',f:a=>a.best>=30},
+ {id:'h10',i:'5',t:'ده ساعته',d:'۱۰ ساعت مطالعه',f:a=>a.total>=36000},
+ {id:'h50',i:'6',t:'کتاب‌خور',d:'۵۰ ساعت مطالعه',f:a=>a.total>=180000},
+ {id:'h100',i:'7',t:'صد ساعتی',d:'۱۰۰ ساعت مطالعه',f:a=>a.total>=360000},
+ {id:'mar',i:'8',t:'ماراتن',d:'جلسه ۹۰ دقیقه‌ای',f:a=>a.maxSes>=5400},
+ {id:'early',i:'9',t:'سحرخیز',d:'مطالعه قبل ۷ صبح',f:a=>a.early},
+ {id:'owl',i:'10',t:'جغد شب',d:'مطالعه بعد ۱۱ شب',f:a=>a.owl},
+ {id:'goal',i:'11',t:'هدف‌گیر',d:'رسیدن به هدف روزانه',f:a=>a.goalDays>=1},
+ {id:'tree',i:'12',t:'باغبان',d:'۱۰ درخت در باغ',f:a=>a.trees>=10},
+ {id:'sub',i:'13',t:'همه‌فن‌حریف',d:'۳ درس مختلف',f:a=>a.subjN>=3}
+];
+function agg(){
+  const byDay={},bySub={},parts=[0,0,0,0];let total=0,maxSes=0,early=false,owl=false,trees=0,moodS=0,moodN=0;
+  for(const l of S.logs){const d=dayIdx(l.ts);byDay[d]=(byDay[d]||0)+l.sec;bySub[l.subj]=(bySub[l.subj]||0)+l.sec;total+=l.sec;if(l.sec>maxSes)maxSes=l.sec;if(l.sec>=1200)trees++;if(l.mood){moodS+=l.mood;moodN++}
+    if(l.kind!=='manual'){const h=new Date(l.ts-l.sec*1000).getHours();parts[h>=5&&h<12?0:h>=12&&h<17?1:h>=17&&h<21?2:3]+=l.sec;if(h>=4&&h<7)early=true;if(h>=23||h<3)owl=true}}
+  const today=dayIdx(Date.now());let streak=0,d=today;if(!byDay[d])d--;while(byDay[d]){streak++;d--}
+  const keys=Object.keys(byDay).map(Number).sort((a,b)=>a-b);let best=0,run=0,prev=null;
+  for(const k of keys){run=(prev!==null&&k===prev+1)?run+1:1;if(run>best)best=run;prev=k}
+  const goalDays=keys.filter(k=>byDay[k]>=S.goal*60).length;
+  return{byDay,bySub,parts,total,maxSes,early,owl,trees,n:S.logs.length,today,todaySec:byDay[today]||0,streak,best,goalDays,subjN:Object.keys(bySub).length,mood:moodN?moodS/moodN:0}}
+let A=agg();
+
+/* ---------- timer engine ---------- */
+let phase='focus',run=false,startTs=0,acc=0,subj=S.subjects[0],tick=null,wl=null;
+if(S.timer){phase=S.timer.phase||'focus';run=!!S.timer.run;startTs=S.timer.startTs||0;acc=S.timer.acc||0;if(S.subjects.includes(S.timer.subj))subj=S.timer.subj}
+const pt=()=>{S.timer={phase,run,startTs,acc,subj};save()};
+const tgt=()=>phase==='free'?0:(phase==='focus'?S.set.focus:phase==='short'?S.set.short:S.set.long)*60;
+const elapsed=()=>acc+(run?(Date.now()-startTs)/1000:0);
+const OC=2*Math.PI*141,IC=2*Math.PI*120;
+const PL={focus:['آماده تمرکز','در حال تمرکز…','تمرکز متوقف شد'],short:['وقت یه نفس تازه','استراحت کن…','استراحت متوقف شد'],long:['استراحت بلند','در حال استراحت…','استراحت متوقف شد'],free:['کرنومتر آزاد','در حال مطالعه…','متوقف شد']};
+const STAGES=[[0,'دانه کاشته شد'],[.08,'جوانه زد'],[.25,'نهال کوچولو…'],[.5,'نهال قوی شد'],[.8,'درخت جوان']];
+const stageOf=p=>{let i=0;STAGES.forEach((s,k)=>{if(p>=s[0])i=k});return i};
+let lastKey='',lastStage=-1,wiltUntil=0;
+function drawPlant(e,T){
+  const el=$('#plant');
+  if(Date.now()<wiltUntil)return;
+  if(phase==='short'||phase==='long'){if(lastKey!=='cup'){el.innerHTML=CUP;lastKey='cup'}return}
+  const p=T?Math.min(1,e/T):Math.min(1,(e%3600)/3600);
+  const key=Math.round(p*300)+'|'+subj+'|'+run+'|'+(e>0)+'|'+phase;
+  if(key===lastKey)return;lastKey=key;
+  el.innerHTML=plant(p,col(subj),{sway:run,paused:!run&&e>0});
+  const st=stageOf(p);
+  if(run&&lastStage>=0&&st>lastStage){el.classList.remove('pop');void el.offsetWidth;el.classList.add('pop');if(S.set.vibrate&&navigator.vibrate)navigator.vibrate(35)}
+  lastStage=st;
+}
+function drawClock(){
+  const e=elapsed(),T=tgt();
+  if(run&&T&&e>=T){finish(true);return}
+  const shown=T?Math.max(0,T-e):e;const m=Math.floor(shown/60),s=Math.floor(shown%60),h=Math.floor(m/60);
+  const txt=h?`${pad(h)}:${pad(m%60)}:${pad(s)}`:`${pad(m)}:${pad(s)}`;
+  $('#clock').textContent=txt;
+  const p=T?Math.min(1,e/T):(e%3600)/3600;
+  $('#arc-in').style.strokeDashoffset=IC*(1-p);
+  $('#arc-in').setAttribute('stroke',(phase==='short'||phase==='long')?'url(#g2)':'url(#g1)');
+  const live=(phase==='focus'||phase==='free')?e:0;
+  const gp=Math.min(1,(A.todaySec+live)/(S.goal*60));
+  $('#arc-out').style.strokeDashoffset=OC*(1-gp);
+  $('#goal-l').textContent=`هدف امروز ${fa(Math.round(gp*100))}٪`;
+  $('#clock-l').textContent=(run&&(phase==='focus'||phase==='free'))?STAGES[stageOf(p)][1]:PL[phase][run?1:(e>0?2:0)];
+  drawPlant(e,T);
+  document.title=run?`${txt} · درسینو`:'درسینو';
+}
+const ICON={play:'<path d="M8 5v14l11-7z"/>',pause:'<rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/>'};
+function setMain(){
+  const e=elapsed(),brk=phase==='short'||phase==='long';
+  $('#ic-main').innerHTML=run?ICON.pause:ICON.play;
+  $('#t-main').textContent=run?'توقف':(e>0?'ادامه':(brk?'شروع استراحت':'شروع'));
+  $('#b-stop').classList.toggle('hide',!(e>0||brk));
+  $('#t-stop').textContent=brk?'رد کردن':'ثبت';
+  $('#b-reset').classList.toggle('hide',!(e>0)||brk);
+  $$('#phases button').forEach(b=>b.classList.toggle('on',b.dataset.p===phase));
+  $('#app').dataset.phase=phase;
+  $('#presets').innerHTML=(phase==='focus'&&e===0&&!run)?[15,25,45,60,90].map(m=>`<button class="chip ${m===S.set.focus?'on':''}" data-m="${m}">${fa(m)} دقیقه</button>`).join(''):'';
+  const ev=S.set.every,filled=S.cycle>0?((S.cycle-1)%ev)+1:0;
+  $('#dots').innerHTML=Array.from({length:ev},(_,i)=>`<i class="${i<filled?'f':''}"></i>`).join('');
+}
+const AMBN={off:'خاموش',rain:'باران',wind:'باد',brown:'نویز'};
+let amb=null,ambTO=null;
+function ambStop(){clearTimeout(ambTO);if(amb){try{amb.src.stop();amb.g.disconnect()}catch(e){}amb=null}}
+function ambStart(preview){
+  ambStop();const k=S.set.amb;if(!k||k==='off')return;
+  if(!preview&&!(run&&(phase==='focus'||phase==='free')))return;
+  try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();if(ac.state==='suspended')ac.resume();
+    const len=ac.sampleRate*3,buf=ac.createBuffer(1,len,ac.sampleRate),d=buf.getChannelData(0);
+    if(k==='brown'){let l=0;for(let i=0;i<len;i++){l=(l+.02*(Math.random()*2-1))/1.02;d[i]=l*3.5}}else for(let i=0;i<len;i++)d[i]=Math.random()*2-1;
+    const src=ac.createBufferSource();src.buffer=buf;src.loop=true;
+    const f=ac.createBiquadFilter(),g=ac.createGain();
+    if(k==='rain'){f.type='highpass';f.frequency.value=1100;g.gain.value=.10}
+    else if(k==='wind'){f.type='lowpass';f.frequency.value=380;g.gain.value=.28}
+    else{f.type='lowpass';f.frequency.value=1000;g.gain.value=.4}
+    src.connect(f);f.connect(g);g.connect(ac.destination);src.start();amb={src,g};
+    if(preview&&!run)ambTO=setTimeout(ambStop,2500);
+  }catch(e){}
+}
+async function lock(){if(!S.set.awake||!('wakeLock' in navigator))return;try{wl=await navigator.wakeLock.request('screen')}catch(e){}}
+function unlock(){try{wl&&wl.release()}catch(e){}wl=null}
+function startRun(){if(run)return;run=true;startTs=Date.now();clearInterval(tick);tick=setInterval(drawClock,250);lock();ambStart();pt();drawClock();setMain()}
+function stopRun(){if(run){acc+=(Date.now()-startTs)/1000}run=false;clearInterval(tick);unlock();ambStop()}
+$('#b-main').onclick=()=>{try{ac=ac||new(window.AudioContext||window.webkitAudioContext)()}catch(e){}if(run){stopRun();pt();drawClock();setMain()}else startRun()};
+$('#b-reset').onclick=()=>{if(!confirm('این جلسه دور انداخته بشه؟'))return;const e0=elapsed();stopRun();acc=0;if(e0>=60&&phase==='focus'){$('#plant').innerHTML=plant(Math.min(.9,e0/(tgt()||3600)),col(subj),{wilt:true});lastKey='wilt';wiltUntil=Date.now()+2200;toast('جلسه متوقف شد؛ دفعه بعد ادامه بده')}pt();drawClock();setMain()};
+$('#b-stop').onclick=()=>finish(false);
+$('#phases').onclick=e=>{const b=e.target.closest('button');if(!b||b.dataset.p===phase)return;if(elapsed()>0&&!confirm('تایمر در جریان است. ریست بشه؟'))return;stopRun();acc=0;phase=b.dataset.p;pt();drawClock();setMain()};
+$('#presets').onclick=e=>{const b=e.target.closest('[data-m]');if(!b)return;S.set.focus=+b.dataset.m;save();drawClock();setMain()};
+
+function finish(auto){
+  const T=tgt();let e=elapsed();const late=(auto&&T)?Math.max(0,e-T):0;if(auto&&T)e=T;
+  stopRun();acc=0;
+  const brk=phase==='short'||phase==='long';
+  if(brk){if(auto){beep();buzz();toast('استراحت تموم شد؛ وقت تمرکزه')}phase='focus';pt();drawClock();setMain();if(auto&&S.set.autoBreak)startRun();return}
+  const sec=Math.round(e);
+  if(auto){beep();buzz()}
+  if(sec<60){toast('جلسه کمتر از ۱ دقیقه ثبت نمی‌شود');pt();drawClock();setMain();return}
+  const pend={sec,subj,kind:phase,full:!!auto,end:Date.now()-late*1000};
+  if(phase==='focus'&&auto){S.cycle++;phase=(S.cycle%S.set.every===0)?'long':'short'}
+  pt();drawClock();setMain();showComplete(pend);
+}
+let pendMood=0;
+function showComplete(p){
+  pendMood=0;
+  sheet(`<div class="bigplant">${plant(p.full?1:Math.max(.3,Math.min(.95,p.sec/(S.set.focus*60))),col(p.subj),{bloom:p.full,sway:true})}</div>
+  <h2>${p.full?'آفرین! یه درخت تازه کاشتی':'جلسه ثبت شد'}</h2><p class="s">${fmtDur(p.sec)} مطالعه</p>
+  <label class="lb">درس</label><select class="tx" id="c-subj">${S.subjects.map(s=>`<option ${s===p.subj?'selected':''}>${esc(s)}</option>`).join('')}</select>
+  <label class="lb">تمرکزت چطور بود؟</label>
+  <div class="moods" id="moods">${MOODS.map((m,i)=>`<button data-m="${i+1}">${m}</button>`).join('')}</div>
+  <label class="lb">یادداشت (اختیاری)</label><textarea class="tx" id="c-note" placeholder="چی خوندی؟ چی موند؟"></textarea>
+  <div class="row"><button class="btn ghost" id="c-drop">دور بینداز</button><button class="btn" id="c-save" style="flex:2">ثبت جلسه</button></div>`,false);
+  $('#moods').onclick=e=>{const b=e.target.closest('button');if(!b)return;pendMood=+b.dataset.m;$$('#moods button').forEach(x=>x.classList.toggle('on',x===b))};
+  const after=()=>{closeSheet();if(p.full&&S.set.autoBreak&&(phase==='short'||phase==='long'))startRun()};
+  $('#c-drop').onclick=()=>{after()};
+  $('#c-save').onclick=()=>{addLog({subj:$('#c-subj').value,sec:p.sec,ts:p.end,kind:p.kind,mood:pendMood||0,note:$('#c-note').value.trim()});after()};
+}
+function addLog(l){
+  const prevTotal=A.total,prevToday=A.todaySec;
+  S.logs.push(Object.assign({id:Date.now()+Math.random()},l));S.logs.sort((a,b)=>b.ts-a.ts);
+  A=agg();
+  const msgs=[];
+  const nl=lvlOf(A.total/60),pl=lvlOf(prevTotal/60);
+  if(nl>pl){msgs.push(`سطح ${fa(nl)}: ${LV[Math.min(nl-1,LV.length-1)]}`);confetti()}
+  if(prevToday<S.goal*60&&A.todaySec>=S.goal*60){msgs.push('هدف امروز کامل شد!');confetti()}
+  ACH.forEach(x=>{if(!S.ach[x.id]&&x.f(A)){S.ach[x.id]=Date.now();msgs.push(`${x.i} دستاورد جدید: ${x.t}`)}});
+  save();msgs.forEach(toastQ);if(!msgs.length)toast('ثبت شد ');
+  renderAll();
+}
+
+/* ---------- renderers ---------- */
+let range=7,hfilter='all';
+function renderHome(){
+  const h=new Date().getHours();
+  $('#hello-s').textContent=h<5?'شب بخیر':h<12?'صبح بخیر':h<17?'روز بخیر':h<21?'عصر بخیر':'شب بخیر';
+  $('#hello-n').textContent=S.name||'خوش اومدی';
+  $('#streak').textContent=fa(A.streak);$('#trees').textContent=fa(A.trees);
+  const min=A.total/60,L=lvlOf(min),st=20*(L-1)**2,nx=20*L**2;
+  $('#lv-n').textContent=fa(L);$('#lv-name').textContent=LV[Math.min(L-1,LV.length-1)];
+  $('#lv-xp').textContent=`${fa(Math.floor(min-st))} / ${fa(nx-st)} امتیاز`;$('#lv-bar').style.width=Math.min(100,(min-st)/(nx-st)*100)+'%';
+  $('#subj-pick').innerHTML=S.subjects.map(s=>`<button class="chip ${s===subj?'on':''}" data-s="${esc(s)}"><span class="dot" style="background:${col(s)}"></span>${esc(s)}</button>`).join('')+'<button class="chip add" data-add="1">+ درس</button>';
+  let wsum=0;
+  $('#week').innerHTML=Array.from({length:7},(_,i)=>{const d=A.today-6+i,v=A.byDay[d]||0;wsum+=v;const c=v>=S.goal*60?'g':v>0?'d':'';return`<div class="wd ${c} ${i===6?'t':''}"><div class="c">${c==='g'?'':(v>0?fa(Math.round(v/60)):'')}</div>${wdLetter(d)}</div>`}).join('');
+  $('#week-sum').textContent=fmtDur(wsum);
+  const todayN=S.logs.filter(l=>dayIdx(l.ts)===A.today).length;
+  $('#tiles').innerHTML=`<div class="tile"><b>${fmtDur(A.todaySec)}</b><span>امروز</span></div><div class="tile"><b>${fa(todayN)}</b><span>جلسه امروز</span></div><div class="tile"><b>${fmtDur(A.total)}</b><span>مجموع</span></div>`;
+  setMain();drawClock();
+}
+$('#subj-pick').onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.add){sheetAddSubject();return}subj=b.dataset.s;pt();renderHome()};
+function sheetAddSubject(){sheet(`<h2>درس جدید</h2><p class="s">اسم درس یا موضوع رو بنویس</p><input class="tx" id="ns" placeholder="مثلاً شیمی" autofocus><button class="btn" id="ns-go">افزودن</button>`);$('#ns-go').onclick=()=>{const v=$('#ns').value.trim();if(!v||S.subjects.includes(v)){toast('اسم معتبر وارد کن');return}S.subjects.push(v);subj=v;save();closeSheet();renderAll()}}
+
+function renderStats(){
+  const days=range,today=A.today;let tot=0,best=0,act=0,n=0;
+  const vals=Array.from({length:days},(_,i)=>{const d=today-days+1+i,v=A.byDay[d]||0;tot+=v;if(v>best)best=v;if(v)act++;return{d,v}});
+  const lo=today-days+1;S.logs.forEach(l=>{if(dayIdx(l.ts)>=lo)n++});
+  $('#kpis').innerHTML=`<div class="kpi big"><span>مجموع مطالعه</span><b>${fmtDur(tot)}</b></div>
+   <div class="kpi"><span>میانگین روزانه</span><b>${fmtDur(tot/days)}</b></div><div class="kpi"><span>بهترین روز</span><b>${fmtDur(best)}</b></div>
+   <div class="kpi"><span>روزهای فعال</span><b>${fa(act)} از ${fa(days)}</b></div><div class="kpi"><span>جلسه‌ها</span><b>${fa(n)}</b></div>
+   <div class="kpi"><span>رکورد پیاپی</span><b>${fa(A.best)} روز</b></div><div class="kpi"><span>کیفیت تمرکز</span><b>${A.mood?MOODS[Math.round(A.mood)-1]+' '+fa(A.mood.toFixed(1)):'—'}</b></div>`;
+  const mx=Math.max(S.goal*60,...vals.map(x=>x.v)),H=120,gap=days>30?1:days>7?3:8;
+  $('#plot').style.setProperty('--gap',gap+'px');$('#xl').style.setProperty('--gap',gap+'px');
+  $('#plot').innerHTML=vals.map((x,i)=>`<div class="col ${i===days-1?'today':''}"><i style="height:${x.v?Math.max(3,x.v/mx*H):0}px"></i></div>`).join('')+`<div class="goal-line" style="bottom:${S.goal*60/mx*H}px"></div>`;
+  $('#xl').innerHTML=vals.map((x,i)=>`<span>${days<=7?wdLetter(x.d):(i%(days>30?15:5)===0?fa(new Intl.DateTimeFormat('en',{day:'numeric',timeZone:'UTC'}).format(new Date(x.d*864e5))):'')}</span>`).join('');
+  // heatmap
+  const row=(new Date(today*864e5).getUTCDay()+1)%7,start=today-row-14*7;let hh='';
+  for(let w=0;w<15;w++)for(let r=0;r<7;r++){const d=start+w*7+r;if(d>today){hh+='<i class="e"></i>';continue}const v=A.byDay[d]||0,p=v/(S.goal*60);const l=!v?0:p<.25?1:p<.6?2:p<1?3:4;hh+=`<i class="${l?'l'+l:''} ${d===today?'now':''}"></i>`}
+  $('#heat').innerHTML=hh;
+  // parts
+  const PN=['صبح (۵–۱۲)','بعدازظهر (۱۲–۱۷)','عصر (۱۷–۲۱)','شب (۲۱–۵)'],PI=['صبح','ظهر','عصر','شب'],pm=Math.max(1,...A.parts),ps=A.parts.reduce((a,b)=>a+b,0);
+  $('#part-ins').textContent=ps?`بیشتر: ${PN[A.parts.indexOf(Math.max(...A.parts))].split(' ')[0]}`:'';
+  $('#parts').innerHTML=A.parts.map((v,i)=>`<div class="hbar"><div class="h"><b style="font-weight:500">${PI[i]} ${PN[i]}</b><span>${fmtDur(v)}</span></div><div class="b"><i style="width:${v/pm*100}%;background:var(--${['w','a','b','b'][i]})"></i></div></div>`).join('');
+  // subjects
+  const se=Object.entries(A.bySub).sort((a,b)=>b[1]-a[1]);
+  $('#by-subj').innerHTML=se.length?se.map(([s,v])=>`<div class="hbar"><div class="h"><b style="font-weight:500"><span class="dot" style="background:${col(s)};margin-left:6px"></span>${esc(s)}</b><span>${fmtDur(v)} · ${fa(Math.round(v/A.total*100))}٪</span></div><div class="b"><i style="width:${v/se[0][1]*100}%;background:${col(s)}"></i></div></div>`).join(''):'<div class="empty">هنوز جلسه‌ای ثبت نشده</div>';
+  // garden
+  const gl=S.logs.slice(0,48);
+  $('#garden-n').textContent=`${fa(A.trees)} درخت`;
+  $('#garden').innerHTML=gl.length?gl.map(l=>plant(Math.max(.3,Math.min(1,l.sec/2700)),col(l.subj),{sun:false,bloom:l.sec>=2700})).join(''):'<div class="empty" style="width:100%">اولین جلسه‌ات رو کامل کن تا اولین درخت بکاری</div>';
+  // badges
+  const got=ACH.filter(x=>S.ach[x.id]).length;$('#ach-n').textContent=`${fa(got)} از ${fa(ACH.length)}`;
+  $('#badges').innerHTML=ACH.map(x=>`<div class="bdg ${S.ach[x.id]?'on':''}"><div class="i">${badgeSvg(x.id)}</div><b>${x.t}</b><small>${x.d}</small></div>`).join('');
+}
+$('#range').onclick=e=>{const b=e.target.closest('button');if(!b)return;range=+b.dataset.r;$$('#range button').forEach(x=>x.classList.toggle('on',x===b));renderStats()};
+
+function renderHist(){
+  $('#fbar').innerHTML=['all',...S.subjects].map(s=>`<button class="chip ${hfilter===s?'on':''}" data-f="${esc(s)}">${s==='all'?'همه':esc(s)}</button>`).join('');
+  const ls=S.logs.filter(l=>hfilter==='all'||l.subj===hfilter).slice(0,250);
+  if(!ls.length){$('#hist').innerHTML='<div class="empty">هنوز چیزی اینجا نیست.<br>اولین جلسه مطالعه‌ات رو شروع کن</div>';return}
+  const g={};ls.forEach(l=>{(g[dayIdx(l.ts)]=g[dayIdx(l.ts)]||[]).push(l)});
+  $('#hist').innerHTML=Object.keys(g).map(Number).sort((a,b)=>b-a).map(d=>{const tot=g[d].reduce((a,l)=>a+l.sec,0);
+    return`<div class="dayh"><b>${dayLabel(d)}</b><span>${fmtDur(tot)}</span></div>`+g[d].map(l=>`<div class="log"><span class="dot" style="background:${col(l.subj)};width:12px;height:12px"></span><div class="n"><b>${esc(l.subj)}</b><small>${l.kind==='manual'?'ثبت دستی':fmtTime(l.ts-l.sec*1000)+' تا '+fmtTime(l.ts)}${l.note?' · '+esc(l.note):''}</small></div>${l.mood?`<span class="m">${MOODS[l.mood-1]}</span>`:''}<div class="d">${fmtDur(l.sec)}</div><button class="x" data-del="${l.id}" aria-label="حذف">×</button></div>`).join('')}).join('');
+}
+$('#fbar').onclick=e=>{const b=e.target.closest('[data-f]');if(!b)return;hfilter=b.dataset.f;renderHist()};
+$('#hist').onclick=e=>{const b=e.target.closest('[data-del]');if(!b)return;const i=S.logs.findIndex(l=>String(l.id)===b.dataset.del);if(i<0)return;const [rm]=S.logs.splice(i,1);A=agg();save();renderAll();toast('حذف شد','بازگردانی',()=>{S.logs.push(rm);S.logs.sort((a,b)=>b.ts-a.ts);A=agg();save();renderAll()})};
+$('#fab').onclick=()=>{
+  let dayMode='today';
+  sheet(`<h2>ثبت دستی</h2><p class="s">مطالعه‌ای که تایمر نزدی رو اضافه کن</p>
+  <label class="lb">درس</label><select class="tx" id="m-subj">${S.subjects.map(s=>`<option ${s===subj?'selected':''}>${esc(s)}</option>`).join('')}</select>
+  <div class="row"><div><label class="lb">ساعت</label><input class="tx" id="m-h" type="number" inputmode="numeric" min="0" max="24" placeholder="۰"></div><div><label class="lb">دقیقه</label><input class="tx" id="m-m" type="number" inputmode="numeric" min="0" max="59" placeholder="۰"></div></div>
+  <label class="lb">روز</label><div class="seg mini" id="m-day"><button data-d="today" class="on">امروز</button><button data-d="yest">دیروز</button><button data-d="other">تاریخ دیگر</button></div>
+  <input class="tx" id="m-date" type="date" style="display:none">
+  <button class="btn" id="m-go">ثبت مطالعه</button>`);
+  $('#m-day').onclick=e=>{const b=e.target.closest('button');if(!b)return;dayMode=b.dataset.d;$$('#m-day button').forEach(x=>x.classList.toggle('on',x===b));$('#m-date').style.display=dayMode==='other'?'block':'none'};
+  $('#m-go').onclick=()=>{const sec=(+$('#m-h').value||0)*3600+(+$('#m-m').value||0)*60;if(sec<60){toast('مدت زمان را وارد کن');return}
+    let ts=Date.now();if(dayMode==='yest')ts-=864e5;if(dayMode==='other'){const v=$('#m-date').value;if(!v){toast('تاریخ را انتخاب کن');return}const [y,m,d]=v.split('-').map(Number);ts=new Date(y,m-1,d,12).getTime()}
+    closeSheet();addLog({subj:$('#m-subj').value,sec,ts,kind:'manual',mood:0,note:''})};
+};
+
+/* settings */
+const getK=k=>k.split('.').reduce((o,p)=>o[p],S);
+const setK=(k,v)=>{const p=k.split('.');const l=p.pop();p.reduce((o,x)=>o[x],S)[l]=v};
+function renderSet(){
+  $('#set-name').value=S.name;$('#amb-t').textContent=AMBN[S.set.amb||'off'];$$('#amb button').forEach(b=>b.classList.toggle('on',b.dataset.a===(S.set.amb||'off')));
+  $$('.step').forEach(s=>{const v=getK(s.dataset.k);s.querySelector('b').textContent=s.dataset.k==='goal'?fmtDur(v*60):fa(v)+' '+(s.dataset.unit||'دقیقه')});
+  $$('[data-tg]').forEach(i=>i.checked=!!S.set[i.dataset.tg]);
+  $$('#themes button').forEach(b=>b.classList.toggle('on',b.dataset.t===S.theme));
+  $('#subj-list').innerHTML=S.subjects.map(s=>`<div class="tag"><span class="dot" style="background:${col(s)};width:12px;height:12px"></span><b>${esc(s)}</b><button data-ds="${esc(s)}" aria-label="حذف">×</button></div>`).join('');
+}
+$('#v-set').addEventListener('click',e=>{
+  const st=e.target.closest('.step button');
+  if(st){const box=st.parentElement,k=box.dataset.k,v=getK(k),stp=+box.dataset.step,d=+st.dataset.d;setK(k,Math.min(+box.dataset.max,Math.max(+box.dataset.min,v+d*stp)));save();renderSet();drawClock();setMain();return}
+  const th=e.target.closest('#themes button');if(th){S.theme=th.dataset.t;save();applyTheme();renderSet();renderAll();return}
+  const ds=e.target.closest('[data-ds]');if(ds){if(S.subjects.length<2){toast('حداقل یک درس لازم است');return}S.subjects=S.subjects.filter(x=>x!==ds.dataset.ds);if(!S.subjects.includes(subj))subj=S.subjects[0];save();renderAll()}
+});
+$('#v-set').addEventListener('change',e=>{if(e.target.dataset.tg){S.set[e.target.dataset.tg]=e.target.checked;save();if(e.target.dataset.tg==='awake'&&run)e.target.checked?lock():unlock()}});
+function setAmb(k){S.set.amb=k;save();$('#amb-t').textContent=AMBN[k];$$('#amb button').forEach(b=>b.classList.toggle('on',b.dataset.a===k));if(run)ambStart();else ambStart(true)}
+$('#amb').onclick=e=>{const b=e.target.closest('button');if(b)setAmb(b.dataset.a)};
+$('#amb-btn').onclick=()=>{const o=['off','rain','wind','brown'];setAmb(o[(o.indexOf(S.set.amb)+1)%4])};
+$('#set-name').oninput=e=>{S.name=e.target.value.trim();save();$('#hello-n').textContent=S.name||'خوش اومدی'};
+$('#add-subj').onclick=()=>{const v=$('#new-subj').value.trim();if(!v||S.subjects.includes(v)){toast('اسم معتبر وارد کن');return}S.subjects.push(v);$('#new-subj').value='';save();renderAll()};
+$('#b-export').onclick=()=>{sheet(`<h2>پشتیبان‌گیری</h2><p class="s">این متن رو کپی کن و جایی امن نگه دار</p><textarea class="tx" id="ex" style="height:150px" readonly>${esc(JSON.stringify(S))}</textarea><button class="btn" id="ex-c">کپی</button>`);
+  $('#ex-c').onclick=async()=>{const t=$('#ex');try{await navigator.clipboard.writeText(t.value)}catch(e){t.select();document.execCommand('copy')}toast('کپی شد ')}};
+$('#b-import').onclick=()=>{sheet(`<h2>بازیابی</h2><p class="s">متن پشتیبان رو اینجا بچسبون. داده‌های فعلی جایگزین می‌شن.</p><textarea class="tx" id="im" style="height:150px"></textarea><button class="btn" id="im-go">بازیابی</button>`);
+  $('#im-go').onclick=()=>{try{const o=JSON.parse($('#im').value);if(!Array.isArray(o.logs)||!Array.isArray(o.subjects))throw 0;S=Object.assign(JSON.parse(JSON.stringify(DEF)),o);S.set=Object.assign({},DEF.set,o.set||{});S.timer=null;save();location.reload()}catch(e){toast('متن معتبر نیست')}}};
+$('#b-reset-all').onclick=()=>{if(confirm('همه جلسه‌ها و تنظیمات پاک بشه؟ این کار برگشت نداره.')){S=JSON.parse(JSON.stringify(DEF));save();location.reload()}};
+
+function applyTheme(){document.documentElement.dataset.theme=S.theme;setTimeout(()=>{$('#meta-theme').content=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()},30)}
+
+/* nav */
+$('#nav').onclick=e=>{const b=e.target.closest('button');if(!b)return;const v=b.dataset.v;$$('#nav button').forEach(x=>x.classList.toggle('on',x===b));$$('.view').forEach(s=>s.classList.toggle('on',s.id==='v-'+v));$('#fab').classList.toggle('on',v==='hist');scrollTo(0,0);renderAll()};
+
+function renderAll(){A=agg();renderHome();renderStats();renderHist();renderSet();renderPlan();renderTests();renderExams();renderInsights()}
+
+
+/* planner, tests, exams and insights */
+const todayKey=()=>{const d=new Date();return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`};
+function openView(v){const b=$(`#nav [data-v="${v}"]`);if(b)b.click()}
+function renderPlan(){
+ const tasks=S.tasks.filter(t=>t.date===todayKey()),done=tasks.filter(t=>t.done).length;
+ $('#task-progress').textContent=`${fa(done)} از ${fa(tasks.length)} انجام‌شده`;$('#task-bar').style.width=(tasks.length?done/tasks.length*100:0)+'%';
+ $('#task-list').innerHTML=tasks.length?tasks.map(t=>`<div class="checkrow"><input type="checkbox" data-task="${t.id}" ${t.done?'checked':''}><div class="grow"><b>${esc(t.title)}</b><div class="subtle">${esc(t.subj||'بدون درس')} · ${fa(t.minutes||0)} دقیقه</div></div><button class="x" data-task-del="${t.id}">×</button></div>`).join(''):'<div class="empty">برای امروز هنوز برنامه‌ای نچیدی.</div>';
+ const n=S.notes.slice().sort((a,b)=>b.ts-a.ts);$('#study-notes').innerHTML=n.length?n.slice(0,8).map(x=>`<div class="itemrow"><div class="grow"><b>${esc(x.title)}</b><div class="subtle">${esc(x.text).slice(0,130)}</div></div><button class="x" data-note-del="${x.id}">×</button></div>`).join(''):'<div class="empty">یادداشت‌هایت اینجا نمایش داده می‌شوند.</div>';
+ const next=S.notes.find(x=>x.next);$('#next-session').innerHTML=next?`<b>${esc(next.next)}</b><div class="subtle">${esc(next.title)} · ${esc(next.subj||'')}</div>`:'هنوز یادداشتی برای جلسه بعد ثبت نکردی.';
+}
+function renderTests(){const a=S.tests,qs=a.reduce((n,x)=>n+x.count,0),correct=a.reduce((n,x)=>n+x.correct,0),mins=a.reduce((n,x)=>n+x.minutes,0);$('#test-kpis').innerHTML=`<div class="metric"><small>تعداد آزمون</small><b>${fa(a.length)}</b></div><div class="metric"><small>کل تست‌ها</small><b>${fa(qs)}</b></div><div class="metric"><small>پاسخ درست</small><b>${fa(correct)}</b></div><div class="metric"><small>زمان تست‌زنی</small><b>${fmtDur(mins*60)}</b></div>`;
+ $('#test-list').innerHTML=a.length?a.slice().sort((x,y)=>y.ts-x.ts).map(x=>`<div class="itemrow"><div class="grow"><b>${esc(x.subj)} · ${fa(x.count)} تست</b><div class="subtle">${new Date(x.ts).toLocaleDateString('fa-IR')} · ${fa(x.minutes)} دقیقه · درست ${fa(x.correct)} / غلط ${fa(x.wrong)} / نزده ${fa(x.blank)}</div>${x.note?`<div class="subtle">${esc(x.note)}</div>`:''}</div><b>${fa(x.count?Math.round(x.correct/x.count*100):0)}٪</b><button class="x" data-test-del="${x.id}">×</button></div>`).join(''):'<div class="empty">هنوز آزمونی ثبت نکردی. اولین آزمونت رو ثبت کن!</div>';
+}
+function renderExams(){const a=S.exams.slice().sort((x,y)=>x.date.localeCompare(y.date));$('#exam-list').innerHTML=a.length?a.map(x=>{const days=Math.ceil((new Date(x.date+'T00:00:00')-new Date(todayKey()+'T00:00:00'))/864e5);return `<div class="card"><div class="row"><div class="grow"><h3>${esc(x.title)}</h3><small>${esc(x.subj)}</small></div><span class="tagpill">${days<0?'گذشته':days===0?'امروز':`${fa(days)} روز مانده`}</span></div><p class="subtle">${new Date(x.date+'T00:00:00').toLocaleDateString('fa-IR')} · آمادگی: ${fa(x.ready)}٪</p><div class="xp"><i style="width:${x.ready}%"></i></div><p class="subtle">${esc(x.topics||'بدون مبحث ثبت‌شده')}</p><button class="x" data-exam-del="${x.id}">حذف امتحان</button></div>`}).join(''):'<div class="empty">امتحان‌های مهمت رو اینجا ثبت کن تا روزشمارشون رو ببینی.</div>'}
+function renderInsights(){const now=Date.now(),week=S.logs.filter(x=>now-x.ts<7*864e5),prev=S.logs.filter(x=>now-x.ts>=7*864e5&&now-x.ts<14*864e5),sum=a=>a.reduce((n,x)=>n+x.sec,0),by={};week.forEach(x=>by[x.subj]=(by[x.subj]||0)+x.sec);const top=Object.entries(by).sort((a,b)=>b[1]-a[1])[0];const diff=sum(week)-sum(prev);const tasks=S.tasks.filter(x=>x.date===todayKey()),done=tasks.filter(x=>x.done).length;
+ $('#insight-content').innerHTML=`<div class="metrics"><div class="metric"><small>مطالعه این هفته</small><b>${fmtDur(sum(week))}</b></div><div class="metric"><small>نسبت به هفته قبل</small><b>${diff>=0?'+':'−'}${fmtDur(Math.abs(diff))}</b></div><div class="metric"><small>پرتکرارترین درس</small><b style="font-size:17px">${top?esc(top[0]):'—'}</b></div><div class="metric"><small>وظایف امروز</small><b>${fa(done)} از ${fa(tasks.length)}</b></div></div><div class="card"><h3>پیشنهاد درسینو</h3><p class="subtle">${!week.length?'هنوز داده کافی برای تحلیل نداریم؛ چند جلسه مطالعه ثبت کن.':top?`این هفته بیشترین زمانت برای ${esc(top[0])} بوده. ${Object.keys(by).length>1?'برای درس‌های دیگر هم زمان مشخصی کنار بگذار.':'تنوع درس‌ها را هم در برنامه‌ات در نظر بگیر.'}`:'به‌تازگی مطالعه‌ای ثبت نشده.'}</p><p class="subtle">${diff>=0?'روند زمان مطالعه‌ات نسبت به هفته قبل بهتر یا برابر بوده.':'زمان مطالعه‌ات نسبت به هفته قبل کمتر شده؛ برنامه را سبک و قابل اجرا بچین.'}</p></div>`;
+ const missions=[{t:'امروز حداقل ۳۰ دقیقه مطالعه کن',ok:S.logs.some(x=>dayIdx(x.ts)===dayIdx(now))&&S.logs.filter(x=>dayIdx(x.ts)===dayIdx(now)).reduce((a,x)=>a+x.sec,0)>=1800},{t:'سه درس مختلف در هفته بخوان',ok:Object.keys(by).length>=3},{t:'سه روز در هفته مطالعه ثبت کن',ok:new Set(week.map(x=>dayIdx(x.ts))).size>=3}];$('#missions').innerHTML=missions.map(m=>`<div class="checkrow"><span class="tagpill">${m.ok?'انجام شد':'در انتظار'}</span><div class="grow">${m.t}</div></div>`).join('');
+}
+function addForm(label,fields,submit){let html=`<h2>${label}</h2>`+fields+`<button class="btn" id="form-save">ثبت</button>`;sheet(html);$('#form-save').onclick=submit}
+$('#task-add').onclick=()=>addForm('وظیفه جدید',`<label class="lb">عنوان</label><input class="tx" id="f-title" placeholder="مثلاً حل تمرین ریاضی"><label class="lb">درس</label><select class="tx" id="f-subj">${S.subjects.map(x=>`<option>${esc(x)}</option>`).join('')}</select><label class="lb">زمان تخمینی (دقیقه)</label><input class="tx" id="f-min" type="number" min="5" value="30">`,()=>{const title=$('#f-title').value.trim();if(!title)return toast('عنوان رو وارد کن');S.tasks.push({id:Date.now(),title,subj:$('#f-subj').value,minutes:+$('#f-min').value||0,date:todayKey(),done:false});save();closeSheet();renderPlan()});
+$('#note-add').onclick=()=>addForm('یادداشت مطالعه',`<label class="lb">عنوان / درس</label><input class="tx" id="f-title" placeholder="مثلاً فصل حرکت‌شناسی"><label class="lb">چه چیزی یاد گرفتی یا کجا گیر کردی؟</label><textarea class="tx" id="f-text" rows="4"></textarea><label class="lb">جلسه بعد از کجا ادامه بدم؟</label><input class="tx" id="f-next" placeholder="مثلاً تست‌های صفحه ۴۲"><label class="lb">نام درس</label><select class="tx" id="f-subj">${S.subjects.map(x=>`<option>${esc(x)}</option>`).join('')}</select>`,()=>{const title=$('#f-title').value.trim();if(!title)return toast('عنوان رو وارد کن');S.notes.push({id:Date.now(),title,text:$('#f-text').value,next:$('#f-next').value,subj:$('#f-subj').value,ts:Date.now()});save();closeSheet();renderPlan()});
+$('#test-add').onclick=()=>addForm('ثبت آزمون تستی',`<label class="lb">درس</label><select class="tx" id="f-subj">${S.subjects.map(x=>`<option>${esc(x)}</option>`).join('')}</select><div class="row"><div class="grow"><label class="lb">تعداد کل تست</label><input class="tx" id="f-count" type="number" min="1" value="30"></div><div class="grow"><label class="lb">زمان (دقیقه)</label><input class="tx" id="f-min" type="number" min="1" value="45"></div></div><div class="row"><div class="grow"><label class="lb">درست</label><input class="tx" id="f-correct" type="number" min="0" value="20"></div><div class="grow"><label class="lb">غلط</label><input class="tx" id="f-wrong" type="number" min="0" value="5"></div><div class="grow"><label class="lb">نزده</label><input class="tx" id="f-blank" type="number" min="0" value="5"></div></div><label class="lb">توضیح / مبحث آزمون</label><textarea class="tx" id="f-note" rows="2"></textarea>`,()=>{const count=+$('#f-count').value,correct=+$('#f-correct').value,wrong=+$('#f-wrong').value,blank=+$('#f-blank').value,minutes=+$('#f-min').value;if(count<1||[correct,wrong,blank,minutes].some(x=>x<0)||correct+wrong+blank!==count||minutes<1)return toast('تعدادها باید درست باشند و جمع پاسخ‌ها برابر کل تست باشد');S.tests.push({id:Date.now(),subj:$('#f-subj').value,count,correct,wrong,blank,minutes,note:$('#f-note').value,ts:Date.now()});save();closeSheet();renderTests();renderInsights()});
+$('#exam-add').onclick=()=>addForm('امتحان جدید',`<label class="lb">نام امتحان</label><input class="tx" id="f-title" placeholder="مثلاً امتحان فیزیک"><label class="lb">درس</label><select class="tx" id="f-subj">${S.subjects.map(x=>`<option>${esc(x)}</option>`).join('')}</select><label class="lb">تاریخ امتحان</label><input class="tx" id="f-date" type="date" min="${todayKey()}"><label class="lb">میزان آمادگی (٪)</label><input class="tx" id="f-ready" type="number" min="0" max="100" value="30"><label class="lb">مباحث امتحان</label><textarea class="tx" id="f-topics" rows="3"></textarea>`,()=>{const title=$('#f-title').value.trim(),date=$('#f-date').value;if(!title||!date)return toast('نام و تاریخ امتحان رو وارد کن');S.exams.push({id:Date.now(),title,subj:$('#f-subj').value,date,ready:Math.max(0,Math.min(100,+$('#f-ready').value||0)),topics:$('#f-topics').value});save();closeSheet();renderExams()});
+$('#v-plan').onclick=e=>{const t=e.target.closest('[data-task]');if(t){const x=S.tasks.find(x=>x.id==t.dataset.task);if(x)x.done=t.checked;save();renderPlan()}const d=e.target.closest('[data-task-del]');if(d){S.tasks=S.tasks.filter(x=>x.id!=d.dataset.taskDel);save();renderPlan()}const n=e.target.closest('[data-note-del]');if(n){S.notes=S.notes.filter(x=>x.id!=n.dataset.noteDel);save();renderPlan()}};
+$('#v-tests').onclick=e=>{const d=e.target.closest('[data-test-del]');if(d){S.tests=S.tests.filter(x=>x.id!=d.dataset.testDel);save();renderTests()}};
+$('#v-exams').onclick=e=>{const d=e.target.closest('[data-exam-del]');if(d){S.exams=S.exams.filter(x=>x.id!=d.dataset.examDel);save();renderExams()}};
+$('#focus-room-open').onclick=()=>{$('#focus-subject').textContent=subj;$('#focus-clock').textContent=$('#clock').textContent;$('#focus-overlay').classList.add('on');$('#focus-toggle').textContent=run?'توقف':'شروع'};
+$('#focus-close').onclick=()=>$('#focus-overlay').classList.remove('on');$('#focus-toggle').onclick=()=>{if(run){stopRun();$('#focus-toggle').textContent='شروع'}else{startRun();$('#focus-toggle').textContent='توقف'}};
+const oldDrawClock=drawClock;drawClock=function(){oldDrawClock();const e=$('#focus-clock');if(e)e.textContent=$('#clock').textContent};
+
+/* onboarding */
+function onboard(){
+  let g=120;
+  sheet(`<h2>به درسینو خوش اومدی</h2><p class="s">دو تا سؤال کوتاه تا برات شخصی‌سازی کنیم</p>
+  <label class="lb">اسمت چیه؟</label><input class="tx" id="ob-n" placeholder="اسم">
+  <label class="lb">هدف مطالعه روزانه</label>
+  <div class="presets" id="ob-g" style="justify-content:flex-start">${[60,120,180,240].map(m=>`<button class="chip ${m===120?'on':''}" data-g="${m}">${fmtDur(m*60)}</button>`).join('')}</div>
+  <button class="btn" id="ob-go" style="margin-top:8px">بزن بریم</button>`,false);
+  $('#ob-g').onclick=e=>{const b=e.target.closest('[data-g]');if(!b)return;g=+b.dataset.g;$$('#ob-g .chip').forEach(x=>x.classList.toggle('on',x===b))};
+  $('#ob-go').onclick=()=>{S.name=$('#ob-n').value.trim();S.goal=g;S.onboarded=true;save();closeSheet();renderAll()};
+}
+
+/* boot */
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){drawClock();if(run)lock()}});
+applyTheme();
+$('#quote').textContent=QUOTES[Math.floor(Math.random()*QUOTES.length)];
+renderAll();
+if(run){clearInterval(tick);tick=setInterval(drawClock,250);lock()}
+if(!S.onboarded&&!S.logs.length)onboard();
+</script>
+</body>
+</html>
