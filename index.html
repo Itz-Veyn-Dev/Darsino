@@ -342,9 +342,43 @@ nav button.on{color:var(--a);background:color-mix(in srgb,var(--a) 13%,transpare
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
 
 .room:not(.on) .ff,.room:not(.on) .orb{animation-play-state:paused}
+
+/* ===== v3: intro + polish ===== */
+#intro{position:fixed;inset:0;z-index:999;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px;text-align:center;transition:opacity 1.1s ease,visibility 0s linear 1.1s}
+#intro.out{opacity:0;visibility:hidden;pointer-events:none}
+#intro p{position:relative;max-width:340px;font-size:clamp(21px,6vw,28px);font-weight:700;line-height:2;color:#f4f1e8;opacity:0;transform:translateY(10px);filter:blur(6px);transition:opacity 1.4s ease,transform 1.4s ease,filter 1.4s ease;text-shadow:0 0 30px color-mix(in srgb,var(--a) 45%,transparent)}
+#intro p.show{opacity:1;transform:none;filter:none}
+#intro p.gone{opacity:0;transform:translateY(-8px);filter:blur(5px);transition-duration:1s}
+#intro small{position:absolute;bottom:calc(36px + env(safe-area-inset-bottom));color:rgba(255,255,255,.28);font-size:11.5px;opacity:0;transition:opacity 1s ease 1.6s}
+#intro.ready small{opacity:1}
+.intro-glow{position:absolute;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--a) 20%,transparent),transparent 65%);filter:blur(30px);opacity:0;transition:opacity 2.4s ease}
+#intro.ready .intro-glow{opacity:.9}
+body.introing .app,body.introing nav,body.introing .fab{opacity:0}
+.app,nav,.fab{transition:opacity .9s ease}
+body.introing{overflow:hidden}
+
+.card{background:linear-gradient(160deg,color-mix(in srgb,var(--card) 100%,transparent),color-mix(in srgb,var(--bg2) 92%,transparent));border:1px solid var(--line);border-radius:var(--r);box-shadow:0 10px 30px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.04)}
+.card h3{letter-spacing:-.2px}
+.hello b{background:linear-gradient(90deg,var(--text),color-mix(in srgb,var(--a) 70%,var(--text)));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.cb.main{box-shadow:0 10px 28px color-mix(in srgb,var(--a) 32%,transparent)}
+.btn:not(.ghost):not(.danger){background:linear-gradient(135deg,var(--a),var(--b));color:var(--ink);border:0;box-shadow:0 8px 20px color-mix(in srgb,var(--a) 25%,transparent)}
+.btn:active,.cb:active,.chip:active{transform:scale(.96)}
+.chip{border-radius:999px}
+.ring-wrap{filter:drop-shadow(0 0 28px color-mix(in srgb,var(--a) 16%,transparent))}
+.xp{height:8px;border-radius:99px;overflow:hidden}
+.xp i{background:linear-gradient(90deg,var(--b),var(--a));border-radius:99px;box-shadow:0 0 12px color-mix(in srgb,var(--a) 50%,transparent)}
+.metric,.kpis>*{border-radius:18px;background:linear-gradient(160deg,var(--card),var(--bg2))}
+nav{left:8px;right:8px;padding:6px 4px;gap:0;border-radius:28px}
+nav button{padding:8px 0 6px;min-width:0;position:relative}
+nav small{font-size:9.5px;white-space:nowrap;overflow:hidden;text-overflow:clip;max-width:100%}
+nav svg{width:21px;height:21px}
+nav button.on:after{content:"";position:absolute;top:2px;left:50%;width:16px;height:3px;margin-left:-8px;border-radius:3px;background:var(--a);box-shadow:0 0 10px var(--a)}
+@media(max-width:380px){nav button:not(.on) small{display:none}nav button.on small{font-size:10px}}
+::-webkit-scrollbar{width:0;height:0}
 </style>
 </head>
 <body>
+<div id="intro" aria-hidden="true"><div class="intro-glow"></div><p id="intro-q"></p><small id="intro-s">برای رد شدن لمس کن</small></div>
 <div id="toasts"></div>
 <div class="app" id="app" data-phase="focus">
 
@@ -412,7 +446,6 @@ nav button.on{color:var(--a);background:color-mix(in srgb,var(--a) 13%,transpare
   <!-- STATS -->
   <section class="view" id="v-stats">
     <header><div class="hello"><small>گزارش پیشرفت</small><b>آمار من</b></div></header>
-    <div class="subtabs"><button data-go="stats">آمار</button><button data-go="insights">تحلیل</button></div>
     <div class="seg" id="range"><button data-r="7" class="on">۷ روز</button><button data-r="30">۳۰ روز</button><button data-r="90">۹۰ روز</button></div>
     <div class="kpis" id="kpis"></div>
     <div class="card"><h3>مطالعه روزانه <small>خط‌چین = هدف</small></h3><div class="plot" id="plot"></div><div class="xl" id="xl"></div></div>
@@ -433,7 +466,6 @@ nav button.on{color:var(--a);background:color-mix(in srgb,var(--a) 13%,transpare
   <!-- PLANNER -->
   <section class="view" id="v-plan">
     <header><div class="hello"><small>برنامه‌ریزی</small><b>برنامه امروز</b></div><button class="chip" id="task-add">+ وظیفه</button></header>
-    <div class="subtabs"><button data-go="plan">امروز</button><button data-go="tests">تست‌ها</button><button data-go="exams">امتحان</button></div>
     <div class="card"><h3>پیشرفت برنامه <small id="task-progress">۰ از ۰</small></h3><div class="xp"><i id="task-bar" style="width:0%"></i></div><div id="task-list" style="margin-top:12px"></div></div>
     <div class="card"><h3>جلسه بعدی</h3><div id="next-session" class="empty">هنوز یادداشتی برای جلسه بعد ثبت نکردی.</div></div>
     <div class="card"><h3>یادداشت‌های مطالعه</h3><div id="study-notes"></div><button class="btn ghost" id="note-add" style="margin-top:10px">+ یادداشت جدید</button></div>
@@ -441,19 +473,16 @@ nav button.on{color:var(--a);background:color-mix(in srgb,var(--a) 13%,transpare
   <!-- TESTS -->
   <section class="view" id="v-tests">
     <header><div class="hello"><small>آزمون و تمرین</small><b>گزارش تست‌ها</b></div><button class="chip" id="test-add">+ ثبت آزمون</button></header>
-    <div class="subtabs"><button data-go="plan">امروز</button><button data-go="tests">تست‌ها</button><button data-go="exams">امتحان</button></div>
     <div class="kpis" id="test-kpis"></div><div class="card"><h3>آزمون‌های اخیر</h3><div id="test-list"></div></div>
   </section>
   <!-- EXAMS -->
   <section class="view" id="v-exams">
     <header><div class="hello"><small>آمادگی امتحان</small><b>امتحان‌های پیش‌رو</b></div><button class="chip" id="exam-add">+ امتحان</button></header>
-    <div class="subtabs"><button data-go="plan">امروز</button><button data-go="tests">تست‌ها</button><button data-go="exams">امتحان</button></div>
     <div id="exam-list"></div>
   </section>
   <!-- INSIGHTS -->
   <section class="view" id="v-insights">
     <header><div class="hello"><small>تحلیل عملکرد</small><b>بینش مطالعه</b></div></header>
-    <div class="subtabs"><button data-go="stats">آمار</button><button data-go="insights">تحلیل</button></div>
     <div id="insight-content"></div><div class="card"><h3>ماموریت‌های این هفته</h3><div id="missions"></div></div>
   </section>
 
@@ -490,7 +519,7 @@ nav button.on{color:var(--a);background:color-mix(in srgb,var(--a) 13%,transpare
       <div class="row"><button class="btn ghost" id="b-export">پشتیبان‌گیری</button><button class="btn ghost" id="b-import">بازیابی</button></div>
       <button class="btn danger" id="b-reset-all" style="margin-top:10px">پاک کردن همه چیز</button>
     </div>
-    <div class="quote">درسینو • نسخه ۲</div>
+    <div class="quote">درسینو • نسخه ۳</div>
   </section>
 </div>
 
@@ -499,6 +528,9 @@ nav button.on{color:var(--a);background:color-mix(in srgb,var(--a) 13%,transpare
 <nav id="nav">
   <button data-v="home" class="on" type="button"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9.5 2.5h5"/></svg><small>تایمر</small></button>
   <button data-v="plan" type="button"><svg viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2"/></svg><small>برنامه</small></button>
+  <button data-v="tests" type="button"><svg viewBox="0 0 24 24"><path d="M7 3h10a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Zm2 5h6M9 12h6M9 16h3"/></svg><small>تست‌ها</small></button>
+  <button data-v="exams" type="button"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M8 3v4M16 3v4M4 10h16M9 15l2 2 4-4"/></svg><small>امتحان</small></button>
+  <button data-v="insights" type="button"><svg viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0-3.5 10.9V17h7v-3.1A6 6 0 0 0 12 3ZM9.5 20.5h5"/></svg><small>تحلیل</small></button>
   <button data-v="stats" type="button"><svg viewBox="0 0 24 24"><path d="M5 20V10M12 20V4M19 20v-7"/></svg><small>آمار</small></button>
   <button data-v="hist" type="button"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v5h5M12 8v4l3 2"/></svg><small>سوابق</small></button>
   <button data-v="set" type="button"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg><small>تنظیمات</small></button>
@@ -941,7 +973,7 @@ $('#b-reset-all').onclick=()=>{if(confirm('همه جلسه‌ها و تنظیم�
 function applyTheme(){document.documentElement.dataset.theme=S.theme;setTimeout(()=>{$('#meta-theme').content=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()},30)}
 
 /* nav */
-const GROUP={home:'home',plan:'plan',tests:'plan',exams:'plan',stats:'stats',insights:'stats',hist:'hist',set:'set'};
+const GROUP={home:'home',plan:'plan',tests:'tests',exams:'exams',stats:'stats',insights:'insights',hist:'hist',set:'set'};
 function go(v){
   if(!GROUP[v])return;
   $$('.view').forEach(s=>s.classList.toggle('on',s.id==='v-'+v));
@@ -1099,7 +1131,24 @@ applyTheme();
 $('#quote').textContent=QUOTES[Math.floor(Math.random()*QUOTES.length)];
 renderAll();
 if(run){clearInterval(tick);tick=setInterval(drawClock,250);lock()}
-if(!S.onboarded&&!S.logs.length)onboard();
+/* onboarding now starts after intro */
+
+/* ===== v3 intro ===== */
+(function(){
+  const Q=['هر قدمِ کوچک امروز، یه پیروزیِ بزرگ فردا می‌شه.','تمرکزِ بیست‌وپنج دقیقه‌ای، آینده‌ت رو می‌سازه.','نیازی نیست عالی باشی؛ فقط امروز شروع کن.','هر درخت، با یه بذر و کلی صبر شروع شد.','تو از اونی که فکر می‌کنی قوی‌تری؛ ادامه بده.','امروزِ تو، فردای تو رو می‌سازه.'];
+  const el=$('#intro'),q=$('#intro-q');let done=false;
+  q.textContent=Q[Math.floor(Math.random()*Q.length)];
+  document.body.classList.add('introing');
+  function finish(){
+    if(done)return;done=true;
+    q.classList.remove('show');q.classList.add('gone');
+    setTimeout(()=>{el.classList.add('out');document.body.classList.remove('introing')},650);
+    setTimeout(()=>{el.remove();if(!S.onboarded&&!S.logs.length)onboard()},1900);
+  }
+  setTimeout(()=>{el.classList.add('ready');q.classList.add('show')},350);
+  setTimeout(finish,4300);
+  el.addEventListener('click',finish);
+})();
 </script>
 <script>if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));}</script>
 </body>
