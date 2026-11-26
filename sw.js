@@ -1,25 +1,8 @@
-const CACHE_NAME = "darsino-v3";
-const APP_FILES = ["./", "./index.html", "./manifest.webmanifest", "./icon.svg"];
-self.addEventListener("install", event => {
-  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_FILES)));
-  self.skipWaiting();
-});
-self.addEventListener("activate", event => {
-  event.waitUntil(
-    caches.keys().then(keys => Promise.all(keys.filter(key => key.startsWith("darsino-") && key !== CACHE_NAME).map(key => caches.delete(key))))
-  );
-  self.clients.claim();
-});
-self.addEventListener("fetch", event => {
-  const req = event.request;
-  if (req.method !== "GET" || new URL(req.url).origin !== self.location.origin) return;
-  event.respondWith(
-    caches.match(req).then(cached => cached || fetch(req).then(response => {
-      if (response && response.ok) {
-        const copy = response.clone();
-        caches.open(CACHE_NAME).then(cache => cache.put(req, copy));
-      }
-      return response;
-    }).catch(() => caches.match("./index.html")))
-  );
+const CACHE='darsino-v4-cache';
+const CORE=['./','./index.html','./manifest.webmanifest','./icon.svg'];
+self.addEventListener('install',event=>{event.waitUntil((async()=>{const c=await caches.open(CACHE);try{await c.addAll(CORE)}catch(e){}await self.skipWaiting()})())});
+self.addEventListener('activate',event=>{event.waitUntil((async()=>{const keys=await caches.keys();await Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)));await self.clients.claim()})())});
+self.addEventListener('fetch',event=>{const req=event.request;if(req.method!=='GET'||new URL(req.url).origin!==location.origin)return;
+ if(req.mode==='navigate'||new URL(req.url).pathname.endsWith('.html')){event.respondWith((async()=>{try{const fresh=await fetch(req,{cache:'no-store'});if(fresh.ok){const c=await caches.open(CACHE);c.put(req,fresh.clone());return fresh}}catch(e){}return (await caches.match(req))||caches.match('./index.html')||Response.error()})());return}
+ event.respondWith((async()=>{const cached=await caches.match(req);if(cached)return cached;try{const res=await fetch(req);if(res.ok){const c=await caches.open(CACHE);c.put(req,res.clone())}return res}catch(e){return cached||Response.error()}})())
 });

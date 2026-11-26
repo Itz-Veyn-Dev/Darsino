@@ -1,14 +1,13 @@
 {
-  "id": "./",
   "name": "درسینو",
   "short_name": "درسینو",
-  "description": "همراه آفلاین مطالعه و برنامه‌ریزی",
-  "start_url": "./",
+  "lang": "fa",
+  "dir": "rtl",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#101311",
-  "theme_color": "#101311",
+  "background_color": "#0b100d",
+  "theme_color": "#0b100d",
   "icons": [
     {
       "src": "./icon.svg",
