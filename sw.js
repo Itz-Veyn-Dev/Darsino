@@ -1,8 +1,9 @@
-const CACHE='darsino-v4-cache';
-const CORE=['./','./index.html','./manifest.webmanifest','./icon.svg'];
-self.addEventListener('install',event=>{event.waitUntil((async()=>{const c=await caches.open(CACHE);try{await c.addAll(CORE)}catch(e){}await self.skipWaiting()})())});
-self.addEventListener('activate',event=>{event.waitUntil((async()=>{const keys=await caches.keys();await Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)));await self.clients.claim()})())});
-self.addEventListener('fetch',event=>{const req=event.request;if(req.method!=='GET'||new URL(req.url).origin!==location.origin)return;
- if(req.mode==='navigate'||new URL(req.url).pathname.endsWith('.html')){event.respondWith((async()=>{try{const fresh=await fetch(req,{cache:'no-store'});if(fresh.ok){const c=await caches.open(CACHE);c.put(req,fresh.clone());return fresh}}catch(e){}return (await caches.match(req))||caches.match('./index.html')||Response.error()})());return}
- event.respondWith((async()=>{const cached=await caches.match(req);if(cached)return cached;try{const res=await fetch(req);if(res.ok){const c=await caches.open(CACHE);c.put(req,res.clone())}return res}catch(e){return cached||Response.error()}})())
+/* Dorsino service worker: network-first so updates always show up */
+const V='dorsino-v5';
+self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(V).then(c=>c.addAll(['./','./index.html','./manifest.webmanifest']).catch(()=>{})))});
+self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==V).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
+self.addEventListener('fetch',e=>{
+  const r=e.request;if(r.method!=='GET')return;
+  const u=new URL(r.url);if(u.origin!==location.origin)return;
+  e.respondWith(fetch(r,{cache:'no-store'}).then(res=>{const cp=res.clone();caches.open(V).then(c=>c.put(r,cp));return res}).catch(()=>caches.match(r).then(m=>m||caches.match('./index.html'))));
 });
